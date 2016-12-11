@@ -892,6 +892,13 @@ UeManager::RecvRrcConnectionSetupCompleted (LteRrcSap::RrcConnectionSetupComplet
       SwitchToState (CONNECTED_NORMALLY);
       m_rrc->m_connectionEstablishedTrace (m_imsi, m_rrc->m_cellId, m_rnti);
       NS_LOG_INFO("ConnectionEstablished for RNTI " << m_rnti << "\n");
+
+      if (m_connectionReleaseEnabled)
+        {
+          m_connectionReleaseTimeout = Simulator::Schedule (
+              m_rrc->m_connectionReleaseTimeoutDuration,
+              &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
+        }
       break;
 
     default:
@@ -926,6 +933,13 @@ UeManager::RecvRrcConnectionReconfigurationCompleted (LteRrcSap::RrcConnectionRe
         }
       SwitchToState (CONNECTED_NORMALLY);
       m_rrc->m_connectionReconfigurationTrace (m_imsi, m_rrc->m_cellId, m_rnti);
+
+      if (m_connectionReleaseEnabled)
+        {
+          m_connectionReleaseTimeout = Simulator::Schedule (
+              m_rrc->m_connectionReleaseTimeoutDuration,
+              &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
+        }
       break;
 
     // This case is added to NS-3 in order to handle bearer de-activation scenario for CONNECTED state UE
@@ -995,6 +1009,13 @@ UeManager::RecvRrcConnectionReestablishmentComplete (LteRrcSap::RrcConnectionRee
 {
   NS_LOG_FUNCTION (this);
   SwitchToState (CONNECTED_NORMALLY);
+
+  if (m_connectionReleaseEnabled)
+    {
+      m_connectionReleaseTimeout = Simulator::Schedule (
+          m_rrc->m_connectionReleaseTimeoutDuration,
+          &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
+    }
 }
 
 void 
@@ -1450,6 +1471,12 @@ LteEnbRrc::GetTypeId (void)
                    TimeValue (MilliSeconds (500)),
                    MakeTimeAccessor (&LteEnbRrc::m_handoverLeavingTimeoutDuration),
                    MakeTimeChecker ())
+    .AddAttribute ("ConnectionReleaseTimeoutDuration",
+                   "If the UE is not active for more than this amount of "
+                   "time, then an RRCContextRelease message is sent.",
+                   TimeValue (Seconds (10)),
+                   MakeTimeAccessor (&LteEnbRrc::m_connectionReleaseTimeout),
+                   MakeTimeChecker ())
 
     // Cell selection related attribute
     .AddAttribute ("QRxLevMin",
@@ -1669,6 +1696,20 @@ LteEnbRrc::GetUeManager (uint16_t rnti)
   std::map<uint16_t, Ptr<UeManager> >::iterator it = m_ueMap.find (rnti);
   NS_ASSERT_MSG (it != m_ueMap.end (), "RNTI " << rnti << " not found in eNB with cellId " << m_cellId);
   return it->second;
+}
+
+void
+LteEnbRrc::SetConnectionReleaseEnabled (bool enable)
+{
+  NS_LOG_FUNCTION (this << (bool) enable);
+  m_connectionReleaseEnabled = enable;
+}
+
+bool
+LteEnbRrc::GetConnectionReleaseEnabled () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_connectionReleaseEnabled;
 }
 
 uint8_t
@@ -1902,6 +1943,15 @@ LteEnbRrc::HandoverLeavingTimeout (uint16_t rnti)
   NS_LOG_FUNCTION (this << rnti);
   NS_ASSERT_MSG (GetUeManager (rnti)->GetState () == UeManager::HANDOVER_LEAVING,
                  "HandoverLeavingTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
+  RemoveUe (rnti);
+}
+
+void
+LteEnbRrc::ConnectionReleaseTimeout (uint16_t rnti)
+{
+  NS_LOG_FUNCTION (this zz rnti);
+  NS_ASSERT_MSG (GetUeManager (rnti)->GetState () == UEManager::CONNECTED_NORMALLY,//////////////////////////////////////////////////////////
+                 "ConnectionReleaseTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
   RemoveUe (rnti);
 }
 

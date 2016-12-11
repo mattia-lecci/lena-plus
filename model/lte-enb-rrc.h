@@ -513,6 +513,12 @@ private:
    * UE CONTEXT RELEASE is received.
    */
   EventId m_handoverLeavingTimeout;
+  /**
+   * Time limit before a _connection release timeout_ occurs. Set after a UE
+   * sends or receives data. Calling LteEnbRrc::ConnectionReleaseTimeout()
+   * when it expires. Reset whenever the UE sends or receives a new transmission.
+   */
+  EventId m_connectionReleaseTimeout;
 
 }; // end of `class UeManager`
 
@@ -698,6 +704,20 @@ public:
   Ptr<UeManager> GetUeManager (uint16_t rnti);
 
   /**
+   * Set method for enabling/disabling the Connection Release mechanism.
+   * 
+   * \param enable the Connection Release Mechanism
+   */
+  void SetConnectionReleaseEnabled (bool enable);
+
+  /**
+   * Get method for the Connection Release mechanism.
+   * 
+   * \return whether it is enabled or not.
+   */
+  bool GetConnectionReleaseEnabled () const;
+
+  /**
    * \brief Add a new UE measurement reporting configuration
    * \param config the new reporting configuration
    * \return the measurement ID (measId) referring to the newly added
@@ -809,6 +829,14 @@ public:
    * \param rnti the C-RNTI whose timeout expired
    */
   void HandoverLeavingTimeout (uint16_t rnti);
+
+  /**
+   * Method triggered when a UE is expected to exchange some data but does
+   * not do so in a reasonable time. The method will remove the UE context.
+   *
+   * \param rnti the C-RNTI whose timeout expired
+   */
+  void ConnectionReleaseTimeout (uint16_t rnti);
 
   /** 
    * Send a HandoverRequest through the X2 SAP interface. This method will
@@ -1200,6 +1228,10 @@ private:
    */
   bool m_admitRrcConnectionRequest;
   /**
+   * Keeps track whether the Connection Release mechanism is enabled or not.
+   */
+  bool m_connectionReleaseEnabled;
+  /**
    * The `RsrpFilterCoefficient` attribute. Determines the strength of
    * smoothing effect induced by layer 3 filtering of RSRP in all attached UE.
    * If equals to 0, no layer 3 filtering is applicable.
@@ -1245,6 +1277,12 @@ private:
    * Release has been previously received, the UE context is destroyed.
    */
   Time m_handoverLeavingTimeoutDuration;
+  /**
+   * The `ConnectionReleaseTimeoutDuration` attribute. If the UE doesn't send
+   * or receive any data before this timeout expires, a CONNECTION RELEASE REQUEST
+   * is sent.
+   */
+  Time m_connectionReleaseTimeoutDuration;
 
   /**
    * The `NewUeContext` trace source. Fired upon creation of a new UE context.
