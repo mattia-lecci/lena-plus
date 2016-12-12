@@ -198,6 +198,12 @@ TypeId LteHelper::GetTypeId (void)
                    BooleanValue (true), 
                    MakeBooleanAccessor (&LteHelper::m_useIdealPrach),
                    MakeBooleanChecker ())    
+    .AddAttribute ("EnableConnectionRelease",
+                   "If true, the eNB can send a ConnectionRelease message to a UE "
+                   "and change its state to RRC_IDLE.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&LteHelper::m_enableConnectionRelease),
+                   MakeBooleanChecker ())
     .AddAttribute ("AnrEnabled",
                    "Activate or deactivate Automatic Neighbour Relation function",
                    BooleanValue (true),
@@ -492,6 +498,16 @@ LteHelper::InstallSingleEnbDevice (Ptr<Node> n)
       mac->SetPrachMode(!m_useIdealPrach);
     }
 
+  // should the connection release mechanism be used?
+  if (m_connectionReleaseEnabled)
+    {
+      rrc->SetConnectionReleaseEnabled (true);
+    }
+  else
+    {
+      rrc->SetConnectionReleaseEnabled (false);
+    }
+
   if (m_epcHelper != 0)
     {
       EnumValue epsBearerToRlcMapping;
@@ -679,6 +695,16 @@ LteHelper::InstallSingleUeDevice (Ptr<Node> n)
       rrcProtocol->SetLteUeRrcSapProvider (rrc->GetLteUeRrcSapProvider ());
       rrc->SetLteUeRrcSapUser (rrcProtocol->GetLteUeRrcSapUser ());
       phy->SetPrachMode(!m_useIdealPrach);
+    }
+
+  // should the connection release mechanism be used?
+  if (m_connectionReleaseEnabled)
+    {
+      rrc->SetConnectionReleaseEnabled (true);
+    }
+  else
+    {
+      rrc->SetConnectionReleaseEnabled (false);
     }
 
   if (m_epcHelper != 0)

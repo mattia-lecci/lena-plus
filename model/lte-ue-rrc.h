@@ -243,6 +243,20 @@ public:
    */
   State GetState () const;
 
+  /**
+   * Get method for the Connection Release mechanism.
+   * 
+   * \return whether it is enabled or not.
+   */
+  bool GetConnectionReleaseEnabled () const;
+  
+  /**
+   * Set method for enabling/disabling the Connection Release mechanism.
+   * 
+   * \param enable the Connection Release Mechanism
+   */
+  void SetConnectionReleaseEnabled (bool enable);
+
   /** 
    * 
    * 
@@ -584,6 +598,11 @@ private:
    * Can be modified using SetUseRlcSm().
    */
   bool m_useRlcSm;
+
+  /**
+   * Keeps track whether the Connection Release mechanism is enabled or not.
+   */
+  bool m_connectionReleaseEnabled;
 
   uint8_t m_lastRrcTransactionIdentifier;
 

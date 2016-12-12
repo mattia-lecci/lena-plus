@@ -788,6 +788,11 @@ private:
    */
   bool m_useIdealPrach;
 
+  /**
+   * The `EnableConnectionRelease` attribute. If true, the eNB can send
+   * a ConnectionRelease message to as UE and change its state to RRC_IDLE.
+   */
+  bool m_connectionReleaseEnabled;
 
   /**
    * The `AnrEnabled` attribute. Activate or deactivate Automatic Neighbour

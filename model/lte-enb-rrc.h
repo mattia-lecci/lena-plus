@@ -515,8 +515,8 @@ private:
   EventId m_handoverLeavingTimeout;
   /**
    * Time limit before a _connection release timeout_ occurs. Set after a UE
+   * when it expires. Reset whenever the UE sends or receives a new transmission.
    * sends or receives data. Calling LteEnbRrc::ConnectionReleaseTimeout()
-   * when it expires.
    */
   EventId m_connectionReleaseTimeout;
 
@@ -704,6 +704,20 @@ public:
   Ptr<UeManager> GetUeManager (uint16_t rnti);
 
   /**
+   * Set method for enabling/disabling the Connection Release mechanism.
+   * 
+   * \param enable the Connection Release Mechanism
+   */
+  void SetConnectionReleaseEnabled (bool enable);
+
+  /**
+   * Get method for the Connection Release mechanism.
+   * 
+   * \return whether it is enabled or not.
+   */
+  bool GetConnectionReleaseEnabled () const;
+
+  /**
    * \brief Add a new UE measurement reporting configuration
    * \param config the new reporting configuration
    * \return the measurement ID (measId) referring to the newly added
@@ -824,7 +838,7 @@ public:
    */
   void ConnectionReleaseTimeout (uint16_t rnti);
 
-  /**
+  /** 
    * Send a HandoverRequest through the X2 SAP interface. This method will
    * trigger a handover which is started by the RRC by sending a handover
    * request to the target eNB over the X2 interface
@@ -1213,6 +1227,10 @@ private:
    * request from a UE.
    */
   bool m_admitRrcConnectionRequest;
+  /**
+   * Keeps track whether the Connection Release mechanism is enabled or not.
+   */
+  bool m_connectionReleaseEnabled;
   /**
    * The `RsrpFilterCoefficient` attribute. Determines the strength of
    * smoothing effect induced by layer 3 filtering of RSRP in all attached UE.

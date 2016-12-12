@@ -402,6 +402,20 @@ LteUeRrc::GetState (void) const
   return m_state;
 }
 
+bool
+LteUeRrc::GetConnectionReleaseEnabled () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_connectionReleaseEnabled;
+}
+
+void
+LteUeRrc::SetConnectionReleaseEnabled (bool enable)
+{
+  NS_LOG_FUNCTION (this << (bool) enable);
+  m_connectionReleaseEnabled = enable;
+}
+
 void
 LteUeRrc::SetUseRlcSm (bool val) 
 {
@@ -1099,6 +1113,54 @@ LteUeRrc::DoRecvRrcConnectionRelease (LteRrcSap::RrcConnectionRelease msg)
   NS_LOG_FUNCTION (this << " RNTI " << m_rnti);
   /// \todo Currently not implemented, see Section 5.3.8 of 3GPP TS 36.331.
   m_lastRrcTransactionIdentifier = msg.rrcTransactionIdentifier;
+
+  /*
+   * delay the following actions defined in this sub-clause 60 ms from the moment the RRCConnectionRelease
+message was received or optionally when lower layers indicate that the receipt of the RRCConnectionRelease
+message has been successfully acknowledged, whichever is earlier;
+   * if (RRCConnectionRelease message includes the idleModeMobilityControlInfo)
+   *    {
+   *      store the cell reselection priority information provided by the idleModeMobilityControlInfo;
+   *      if (t320 is included)
+   *        {
+   *          start timer T320, with the timer value set according to the value of t320;  // check section 5.3.8.4 for the timer expiry
+   *        } 
+   *    }
+   * else
+   *  {
+   *    apply the cell reselection priority information broadcast in the system information;
+   *  }
+   * if (releaseCause received in the RRCConnectionRelease message indicates loadBalancingTAURequired)
+   *  {
+   *    perform the actions upon leaving RRC_CONNECTED as specified in 5.3.12, with release cause 'CS Fallback
+High Priority';
+   *  }
+   *  else
+   *    {
+   *      if (extendedWaitTime is present AND (the UE supports delay tolerant access OR the UE is a NB-IoT UE) )
+   *        {
+   *          forward the extendedWaitTime to upper layers;
+   *        }
+   *      if (releaseCause received in the RRCConnectionRelease message indicates rrc-Suspend)
+   *        {
+   *          reset MAC;
+   *          stop all timers that are running except T320, T325 and T330;
+   *          re-establish RLC entities for all SRBs and DRBs;
+   *          store the UE AS Context including the current RRC configuration, the current security context, the PDCP
+state including ROHC state, C-RNTI used in the source PCell, the cellIdentity and the physical cell identity
+of the source PCell;
+   *          store the resumeIdentity provided by E-UTRAN;
+   *          suspend all SRB(s) and DRB(s);
+   *          indicate the suspension of the RRC connection to upper layers;
+   *          indicate the release of LWA configuration, if configured, to upper layers;
+   *          release the LWIP configuration, if configured, as described in 5.6.17.3;
+   *        }
+   *      else
+   *        {
+   *          perform the actions upon leaving RRC_CONNECTED as specified in 5.3.12, with release cause 'other';
+   *        }
+   *   }
+   */
 
   // disconnect
   this->m_asSapUser->Disconnect(); 
