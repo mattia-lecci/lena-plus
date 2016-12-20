@@ -493,7 +493,7 @@ void
 UeManager::SendRrcConnectionRelease ()
 {
   // TODO implement in the 3gpp way, see Section 5.3.8 of 3GPP TS 36.331.
-  NS_LOG_INFO("Sending release for ue with RNTI " << (uint32_t) m_rnti);
+  NS_LOG_INFO("Sending release for ue with RNTI " << (uint32_t) m_rnti << ", IMSI=" << m_imsi);
   // De-activation towards UE, it will deactivate all bearers
   LteRrcSap::RrcConnectionRelease msg;
   msg.rrcTransactionIdentifier = this->GetNewRrcTransactionIdentifier();
@@ -703,8 +703,17 @@ UeManager::SendData (uint8_t bid, Ptr<Packet> p)
             if (bearerInfo != NULL)
               {
                 LtePdcpSapProvider* pdcpSapProvider = bearerInfo->m_pdcp->GetLtePdcpSapProvider ();
-        pdcpSapProvider->TransmitPdcpSdu (params);
-      }
+                pdcpSapProvider->TransmitPdcpSdu (params);
+
+                if (m_rrc->m_connectionReleaseEnabled)
+                  {
+                    NS_LOG_LOGIC ("ConnectionReleaseTimeout resetted: data sent to UE with RNTI=" << m_rnti << ", IMSI=" << m_imsi);
+                    m_connectionReleaseTimeout.Cancel ();
+                    m_connectionReleaseTimeout = Simulator::Schedule (
+                                                  m_rrc->m_connectionReleaseTimeoutDuration,
+                                                  &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
+                  }
+              }
           }
       }
       break;
@@ -893,8 +902,9 @@ UeManager::RecvRrcConnectionSetupCompleted (LteRrcSap::RrcConnectionSetupComplet
       m_rrc->m_connectionEstablishedTrace (m_imsi, m_rrc->m_cellId, m_rnti);
       NS_LOG_INFO("ConnectionEstablished for RNTI " << m_rnti << "\n");
 
-      if (m_connectionReleaseEnabled)
+      if (m_rrc->m_connectionReleaseEnabled)
         {
+          m_connectionReleaseTimeout.Cancel();
           m_connectionReleaseTimeout = Simulator::Schedule (
               m_rrc->m_connectionReleaseTimeoutDuration,
               &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
@@ -934,8 +944,9 @@ UeManager::RecvRrcConnectionReconfigurationCompleted (LteRrcSap::RrcConnectionRe
       SwitchToState (CONNECTED_NORMALLY);
       m_rrc->m_connectionReconfigurationTrace (m_imsi, m_rrc->m_cellId, m_rnti);
 
-      if (m_connectionReleaseEnabled)
+      if (m_rrc->m_connectionReleaseEnabled)
         {
+          m_connectionReleaseTimeout.Cancel();
           m_connectionReleaseTimeout = Simulator::Schedule (
               m_rrc->m_connectionReleaseTimeoutDuration,
               &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
@@ -1010,8 +1021,9 @@ UeManager::RecvRrcConnectionReestablishmentComplete (LteRrcSap::RrcConnectionRee
   NS_LOG_FUNCTION (this);
   SwitchToState (CONNECTED_NORMALLY);
 
-  if (m_connectionReleaseEnabled)
+  if (m_rrc->m_connectionReleaseEnabled)
     {
+      m_connectionReleaseTimeout.Cancel();
       m_connectionReleaseTimeout = Simulator::Schedule (
           m_rrc->m_connectionReleaseTimeoutDuration,
           &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
@@ -1098,6 +1110,15 @@ UeManager::DoReceivePdcpSdu (LtePdcpSapUser::ReceivePdcpSduParameters params)
       tag.SetBid (Lcid2Bid (params.lcid));
       params.pdcpSdu->AddPacketTag (tag);
       m_rrc->m_forwardUpCallback (params.pdcpSdu);
+
+      if (m_rrc->m_connectionReleaseEnabled)
+        { 
+          NS_LOG_LOGIC ("ConnectionReleaseTimeout resetted: PDCP SDU received from RNTI=" << m_rnti << ", IMSI=" << m_imsi);
+          m_connectionReleaseTimeout.Cancel ();
+          m_connectionReleaseTimeout = Simulator::Schedule (
+                                        m_rrc->m_connectionReleaseTimeoutDuration,
+                                        &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
+        }
     }
 }
 
@@ -1475,7 +1496,7 @@ LteEnbRrc::GetTypeId (void)
                    "If the UE is not active for more than this amount of "
                    "time, then an RRCContextRelease message is sent.",
                    TimeValue (Seconds (10)),
-                   MakeTimeAccessor (&LteEnbRrc::m_connectionReleaseTimeout),
+                   MakeTimeAccessor (&LteEnbRrc::m_connectionReleaseTimeoutDuration),
                    MakeTimeChecker ())
 
     // Cell selection related attribute
@@ -1945,22 +1966,15 @@ LteEnbRrc::HandoverLeavingTimeout (uint16_t rnti)
                  "HandoverLeavingTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
   RemoveUe (rnti);
 }
-void
-LteEnbRrc::ConnectionReleaseTimeout (uint16_t rnti)
-{
-  NS_LOG_FUNCTION (this zz rnti);
-  NS_ASSERT_MSG (GetUeManager (rnti)->GetState () == UEManager::CONNECTED_NORMALLY,//////////////////////////////////////////////////////////
-                  "ConnectionReleaseTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
-  RemoveUe (rnti);
-}
 
 void
 LteEnbRrc::ConnectionReleaseTimeout (uint16_t rnti)
 {
-  NS_LOG_FUNCTION (this zz rnti);
-  NS_ASSERT_MSG (GetUeManager (rnti)->GetState () == UEManager::CONNECTED_NORMALLY,//////////////////////////////////////////////////////////
-                 "ConnectionReleaseTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
-  RemoveUe (rnti);
+  NS_LOG_INFO ("ConnectionReleaseTimeout expired for UE with RNTI=" << rnti << ", IMSI=" << GetUeManager (rnti)->GetImsi ());
+  NS_LOG_FUNCTION (this << rnti);
+  NS_ASSERT_MSG (GetUeManager (rnti)->GetState () == UeManager::CONNECTED_NORMALLY,//////////////////////////////////////////////////////////
+                  "ConnectionReleaseTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
+  RemoveUeByImsi (rnti);
 }
 
 void

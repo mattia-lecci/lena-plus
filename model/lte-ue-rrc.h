@@ -687,6 +687,11 @@ private:
    * procedure. Exporting IMSI, cell ID, and RNTI.
    */
   TracedCallback<uint64_t, uint16_t, uint16_t> m_handoverEndErrorTrace;
+  /**
+   * The `ConnectionRelease` trace source. Fired upon RRC Connection
+   * Release. Exporting IMSI, cell ID, and RNTI.
+   */
+  TracedCallback<uint64_t, uint16_t, uint16_t> m_connectionReleaseTrace;
 
   /// True if a connection request by upper layers is pending.
   bool m_connectionPending;

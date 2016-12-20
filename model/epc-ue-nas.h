@@ -29,6 +29,7 @@
 #include <ns3/object.h>
 #include <ns3/lte-as-sap.h>
 #include <ns3/epc-tft-classifier.h>
+#include <stack>
 
 namespace ns3 {
 
@@ -200,6 +201,11 @@ private:
 
   /// The current UE NAS state.
   State m_state;
+
+  /**
+   * Buffer that stores packets arrived in state IDLE_REGISTERED
+   */
+  std::stack<Ptr<Packet> > m_packetBuffer;
 
   /**
    * The `StateTransition` trace source. Fired upon every UE NAS state
