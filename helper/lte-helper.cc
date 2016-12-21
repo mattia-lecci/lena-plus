@@ -198,6 +198,12 @@ TypeId LteHelper::GetTypeId (void)
                    BooleanValue (true), 
                    MakeBooleanAccessor (&LteHelper::m_useIdealPrach),
                    MakeBooleanChecker ())    
+    .AddAttribute ("ConnectionReleaseEnabled",
+                   "If true, the eNB can send a ConnectionRelease message to a UE "
+                   "and change its state to RRC_IDLE.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&LteHelper::m_connectionReleaseEnabled),
+                   MakeBooleanChecker ())
     .AddAttribute ("AnrEnabled",
                    "Activate or deactivate Automatic Neighbour Relation function",
                    BooleanValue (true),
@@ -471,7 +477,7 @@ LteHelper::InstallSingleEnbDevice (Ptr<Node> n)
   Ptr<LteFfrAlgorithm> ffrAlgorithm = m_ffrAlgorithmFactory.Create<LteFfrAlgorithm> ();
   Ptr<LteHandoverAlgorithm> handoverAlgorithm = m_handoverAlgorithmFactory.Create<LteHandoverAlgorithm> ();
   Ptr<LteEnbRrc> rrc = CreateObject<LteEnbRrc> ();
-
+  
   if (m_useIdealRrc)
     {
       Ptr<LteEnbRrcProtocolIdeal> rrcProtocol = CreateObject<LteEnbRrcProtocolIdeal> ();
@@ -490,6 +496,16 @@ LteHelper::InstallSingleEnbDevice (Ptr<Node> n)
       rrc->AggregateObject (rrcProtocol);
       rrcProtocol->SetCellId (cellId);
       mac->SetPrachMode(!m_useIdealPrach);
+    }
+  
+  // should the connection release mechanism be used?
+  if (m_connectionReleaseEnabled)
+    {
+      rrc->SetConnectionReleaseEnabled (true);
+    }
+  else
+    {
+      rrc->SetConnectionReleaseEnabled (false);
     }
 
   if (m_epcHelper != 0)
@@ -679,6 +695,16 @@ LteHelper::InstallSingleUeDevice (Ptr<Node> n)
       rrcProtocol->SetLteUeRrcSapProvider (rrc->GetLteUeRrcSapProvider ());
       rrc->SetLteUeRrcSapUser (rrcProtocol->GetLteUeRrcSapUser ());
       phy->SetPrachMode(!m_useIdealPrach);
+    }
+
+  // should the connection release mechanism be used?
+  if (m_connectionReleaseEnabled)
+    {
+      rrc->SetConnectionReleaseEnabled (true);
+    }
+  else
+    {
+      rrc->SetConnectionReleaseEnabled (false);
     }
 
   if (m_epcHelper != 0)

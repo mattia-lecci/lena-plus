@@ -1,0 +1,115 @@
+Legenda:
+-- già fatto
+** dubbio. leggere le note in fondo
+?? non so cosa/come fare
+XX non è da fare (me ne sono accorto dopo)
+<<<< catene di metodi attivate alla connessione dell'ue
+
+
+Disconnessione:
+-- aggiungere m_connectionReleaseTimeout (EventId) e m_connectionReleaseTimeoutDuration (10s) su UeManager e sistemare attributi
+** -- aggiungere void LteEnbRrc::ConnectionReleaseTimeout (uint16_t rnti) su LteEnbRrc
+-- modificato README
+-- aggiunto m_enableConnectionRelease su LteHelper e relativo attributo
+-- aggiunto m_connectionReleasedEnabled su LteEnbRrc e LteUeRrc con relativi set/get (no attributo)
+-- aggiungere su LteHelper la condizione per attivare/disattivare la connection release (su InstallSingleEnbDevice e InstallSingleUeDevice)
+*4* fare metodo LteUeRrc::DoRecvRrcConnectionRelease secondo Section 5.3.8 of 3GPP TS 36.331 --> disconnesso, ma continua a fare measurement reports
+?? *3* modificare metodo UeManager::SendRrcConnectionRelease secondo Section 5.3.8 of 3GPP TS 36.331
+-- aggiungere schedule su UeManager::RecvRrcConnectionSetupCompleted, UeManager::RecvRrcConnectionReconfigurationCompleted, UeManager::RecvRrcConnectionReestablishmentCompleted
+-- sistamare il trace per la connection release
+fare la riconnessione quando lo UE vuole inviare nuovi dati
+fare la riconnessione quando il SGW vuole mandare dati allo UE
+XX aggiungere stato CONNECTION_IDLE su UeManager (.h) e su g_ueManagerStateName (.cc <- per ToString) <<<<<<<<<<<< no! una volta released viene eliminato dalla mappa dell'eNB
+
+
+
+
+
+
+
+
+<<<< LC sono i logic channels del MAC che mappano RB dell'PDCP/RLC/...
+<<<< rimettere doreset per mac
+<<<< 0s EpcMme::AddUe(imsi) chiamato a tempo 0 da LteHelper tramite PointToPointEpcHelper (andrebbe tenuto probabilmente) (aggiunge m_ueInfoMap[imsi])
+<<<< 0s stesso per EpcSgwPgwApplication::AddUe(imsi) in m_ueInfoByImsiMap[imsi]
+<<<< 0s sempre ltehelper a tempo 0 fa EpcUeNas->Connect(), EpcHelper->ActivateEpsBearer:
+    =>LteUeRrc->DoConnect()
+    =>m_mme->AddBearer(...)
+    =>m_sgwPgwApp->SetUeAddress(..)
+    =>ueLteDevice->GetNas()->ActivateEpsBearer(..)
+<<<< 0.016s  a un certo punto parte LteUeRrc::DoRecvSystemInformation(..)=>configura rach=>StartConnection()=>m_cmacSapProvider->startContentionBasedRandomAccessProcedure()=>RandomlySelectAndSendRaPreamble()
+<<<< 0.031s dopo un po' parte LteEnbPhy::StartSubFrame()=>LteEnbMac::DoSubframeIndication()=>LteEnbRrc::DoAllocateTemporaryCellRnti()=>LteEnbRrc::AddUe()
+<<<< 0.0332143s Percorso send connection request: LteUeMac::RecvRaResponse=>LteUeRrc::DoNotifyRarReceived=>LteUeRrcProtocolReal::DoSendRrcConnectionRequest(..)
+<<<< 0.0379286s Percorso receive connection request: LteRrcProtocolReal::DoReceivePdcpPdu with message type 1 => m_enbRrcSapProvider->RecvRrcConnectionRequest(..) => ... LteEnbRrc::DoRecvRrcConnectionRequest(..) => GetUeManager (rnti)->RecvRrcConnectionRequest
+
+PROBLEMA: serve che a LteUeRrc arrivi DoRecvRrcConnectionSetup=>ApplyRadioResourceConfigDedicated altrimenti m_bid2DrbidMap non viene popolata
+Viene dato come risposta a una connection request
+
+Riconnessione:
+-- EpcUeNas::Send dovrebbe avvisare l'epc che l'ue vuole riconnettersi se è in stato IDLE_REGISTERED
+*5* -- raccogliere pachetti in arrivo in un buffer
+-- quando si passa da idle_registered a active inviare tutti i pacchetti nel buffer
+-- evito di cancellare drb in ue rrc e mac
+?? su EpcUeNas alla riconnessione ho creato nuovi eps bearer default
+PROVA: conservo drbmap in lteuerrc, aggiungo metodo getDRb in LteRadioBeareInfo 
+PROBLEMA: EpcUeNas::SwitchToState(ACTIVE) => DoActivateEpsBearer (..,..) per ogni m_bearerToBeActivatedList => aggiunti da EpcUeNas::ActivateEpsBearer => chiamato da PointToPointEpcHelper::ActivateEpsBearer => chiamato da LteHelper::Attach
+PROBLEMA: EpcUeNas::Disconnect => LteUeRrc::DoDisconnect => LeaveConnectedMode() => LteUeMac::DoRemoveLc
+PROBLEMA: EpcUeNas::Disconnect => LteUeRrc::DoDisconnect => LeaveConnectedMode() => LteUeRrc::DoNotifyConnectionExpired => DoReset()
+PROBLEMA: LteRlcUm::DoNotifyTxOpportunity => m_rnti????????????
+
+11.6132s 3 EpcUeNas:Send(): [INFO ] Nas sends packet to rrc for bid  at time 11.6132
+11.6132s 3 LteUeRrc:DoSendData(): [INFO ] Drbid (NUL) shouldn't be used for data at time 11.6132
+
+
+da controllare:
+  UeManager::RecvRrcConnectionSetupCompleted
+  UeManager::RecvRrcConnectionReconfigurationCompleted
+  UeManager::RecvRrcConnectionReestablishmentComplete
+  UeManager::SwitchToState
+  ns3::EpcX2UeContextReleaseHeader
+  ns3::RrcConnectionReleaseHeader
+  ns3::LteRrcSap::RrcConnectionRelease
+    LteEnbRrc::RemoveUeByImsi (prima chiama UeManager::SendRrcConnectionRelease, poi aspetta 0.2s, poi chiama LteEnbRrc::RemoveUe)
+  Leggere TS 36.331 section 5.3.1.1 (introduction)
+  Leggere TS 36.331 section 5.3.3(.3a e .4a) (connection resume)
+  Leggere TS 36.331 section 5.3.9 (connection release richiesta dallo UE)
+  Leggere TS 36.331 section 5.3.12 (UE actions upon leaving RRC_CONNECTED)
+  Leggere TS 36.413 s8.3.2 (ue context release request) e 9.1.4.5 (architettura messaggio)
+    Problema: MeasurementReportTriggering ()
+
+
+
+Siti:
+https://www.nsnam.org/docs/models/html/lte-design.html#ue-rrc-state-machine
+http://lteuniversity.com/get_trained/expert_opinion1/b/lauroortigoza/archive/2013/12/18/rrc-connection-release.aspx
+http://www.sharetechnote.com/html/Handbook_LTE_RNTI.html
+http://lteuniversity.com/ask_the_expert/f/59/t/2728.aspx
+http://howltestuffworks.blogspot.it/2011/11/rrc-connection-release.html
+http://tech.queryhome.com/41896/what-cause-loadbalancingtaurequired-connection-release
+http://tech.queryhome.com/24139/lte-how-rrc-connection-release-procedure-works
+http://www.rfwireless-world.com/Tutorials/LTE-UE-RRC-states.html
+http://know-lte.blogspot.it/2016/06/lte-rrc-states.html
+
+
+
+Note:
+- "A proper implementation of IDLE mode is still missing in the simulator"
+- "If the timer expires then the eNB will tell the UE to go idle. That does not release the bearers, it just releases the air interface resources. The UE is still attached, it is just able to sleep more and conserve battery life."
+- "RRC_IDLE: The radio is inactive but  IP address is assigned and tracked by the network. UE is known in EPC but not known to eNB"
+- "Only in exceptional cases, as specified within this specification, TS 36.300 [9], TS 36.304 [4] or TS 24.301 [35], may the UE abort the RRC connection, i.e. move to RRC_IDLE without notifying E-UTRAN."
+- "When the RRC connection is suspended, the UE stores the UE AS context and the resumeIdentity, and transitions to RRC_IDLE state"
+** fa RemoveUe o è troppo? Può partire solo dallo stato CONNECTED_NORMALLY? Dovrebbe fare qualcosa di più...
+*3* Ho usato LteEnbRrc::RemoveUeByImsi, che chiama UeManager::SendRrcConnectionRelease, poi aspetta 0.2s, poi chiama LteEnbRrc::RemoveUe
+*4* Va bene LeaveConnectedMode()? Va in IDLE_CAMPED_NORMALLY e fa un clear della DRB map
+*5* ritorno true? non so se andranno a buon fine
+
+Suggerimenti per run/debug:/log
+./waf --run scratch/<nome_programma>
+./waf --run "scratch/<nome_programma>"
+./waf --run "scratch/<nome_programma> --<percorso_attributo>=<nuovo_valore>"        e.g.        ./waf --run "scratch/lena-simple --ns3::LteHelper::ConnectionReleaseEnabled=true"
+./waf -run scratch/<nome_programma> --command-template="%s --<percorso_attributo>=<nuovo_valore>"       e.g.        ./waf --run scratch/lena-simple-epc --command-template="%s --simTime=20"
+
+./waf --run scratch/<nome_programma> --command-template="nemiver %s"
+./waf -run scratch/<nome_programma> --command-template="nemiver %s --<percorso_attributo>=<nuovo_valore>"       e.g.        ./waf --run scratch/<nome_programma> --command-template="nemiver %s --simTime=20"
+
+export "NS_LOG=<nome_dominio_log>=<livelli_log |separated>|<prefissi |separated>:<nome_dominio_log>=..."  e.g. export "NS_LOG=UdpClient=level_info|prefix_func|prefix_time:LteUeRrc=all|prefix_func|prefix_time"

@@ -18,7 +18,7 @@
  *
  * Authors: Nicola Baldo <nbaldo@cttc.es>
  *          Marco Miozzo <mmiozzo@cttc.es>
- *          Manuel Requena <manuel.requena@cttc.es> 
+ *          Manuel Requena <manuel.requena@cttc.es>
  *
  * Modified by Michele Polese <michele.polese@gmail.com>
  *    (support for RACH realistic model and RRC_CONNECTED->RRC_IDLE state transistion)
@@ -72,7 +72,7 @@ public:
 
   /**
    * The state of the UeManager at the eNB RRC
-   * 
+   *
    */
   enum State
   {
@@ -90,15 +90,15 @@ public:
   };
 
   UeManager ();
- 
-  /** 
+
+  /**
    * UeManager constructor
-   * 
+   *
    * \param rrc pointer to the LteEnbRrc holding this UeManager
    * \param rnti RNTI of the UE
    * \param s initial state of the UeManager
-   * 
-   * \return 
+   *
+   * \return
    */
   UeManager (Ptr<LteEnbRrc> rrc, uint16_t rnti, State s);
 
@@ -108,48 +108,48 @@ public:
 protected:
   virtual void DoInitialize ();
   virtual void DoDispose ();
-public: 
+public:
   static TypeId GetTypeId (void);
 
-  /** 
+  /**
    * Set the identifiers of the source eNB for the case where a UE
-   * joins the current eNB as part of a handover procedure 
-   * 
-   * \param sourceCellId 
-   * \param sourceX2apId 
+   * joins the current eNB as part of a handover procedure
+   *
+   * \param sourceCellId
+   * \param sourceX2apId
    */
   void SetSource (uint16_t sourceCellId, uint16_t sourceX2apId);
 
-  /** 
+  /**
    * Set the IMSI
-   * 
+   *
    * \param imsi the IMSI
    */
   void SetImsi (uint64_t imsi);
 
-  /** 
+  /**
    * Setup a new data radio bearer, including both the configuration
    * within the eNB and the necessary RRC signaling with the UE
-   * 
+   *
    * \param bearer the QoS characteristics of the bearer
    * \param bearerId the EPS bearer identifier
    * \param gtpTeid S1-bearer GTP tunnel endpoint identifier, see 36.423 9.2.1
    * \param transportLayerAddress  IP Address of the SGW, see 36.423 9.2.1
-   * 
+   *
    */
   void SetupDataRadioBearer (EpsBearer bearer, uint8_t bearerId, uint32_t gtpTeid, Ipv4Address transportLayerAddress);
 
-  /** 
+  /**
    * Start all configured data radio bearers. It is safe to call this
    * method if any bearer had been already started previously.
-   * 
+   *
    */
   void RecordDataRadioBearersToBeStarted ();
 
-  /** 
+  /**
    * Start the data radio bearers that have been previously recorded
-   * to be started using RecordDataRadioBearersToBeStarted() 
-   * 
+   * to be started using RecordDataRadioBearersToBeStarted()
+   *
    */
   void StartDataRadioBearers ();
 
@@ -161,85 +161,85 @@ public:
    */
   void ReleaseDataRadioBearer (uint8_t drbid);
 
-  /** 
+  /**
    * schedule an RRC Connection Reconfiguration procedure with the UE
-   * 
+   *
    */
   void ScheduleRrcConnectionReconfiguration ();
 
-  /** 
+  /**
    * Start the handover preparation and send the handover request
-   * 
+   *
    * \param cellId id of the target cell
    */
   void PrepareHandover (uint16_t cellId);
 
-  /** 
+  /**
    * take the necessary actions in response to the reception of an X2 HANDOVER REQUEST ACK message
-   * 
-   * \param params 
+   *
+   * \param params
    */
   void RecvHandoverRequestAck (EpcX2SapUser::HandoverRequestAckParams params);
 
-  /** 
-   * 
+  /**
+   *
    * \return the HandoverPreparationInfo sent by the source eNB to the
    * target eNB in the X2-based handover procedure
    */
   LteRrcSap::RadioResourceConfigDedicated GetRadioResourceConfigForHandoverPreparationInfo ();
 
-  /** 
-   * 
+  /**
+   *
    * \return retrieve the data that the target eNB needs to send to the source
    * eNB as the Handover Command in the X2-based handover
    * procedure.
    *
    * \note mobility control info is not expected to be filled in
-   * (shall be filled in by the caller). 
+   * (shall be filled in by the caller).
    */
   LteRrcSap::RrcConnectionReconfiguration GetRrcConnectionReconfigurationForHandover ();
 
-  /** 
+  /**
    * Send a data packet over the appropriate Data Radio Bearer
-   * 
+   *
    * \param bid the corresponding EPS Bearer ID
    * \param p the packet
    */
   void SendData (uint8_t bid, Ptr<Packet> p);
 
-  /** 
-   * 
+  /**
+   *
    * \return a list of ERAB-to-be-setup items to be put in a X2 HO REQ message
    */
   std::vector<EpcX2Sap::ErabToBeSetupItem> GetErabList ();
 
-  /** 
+  /**
    * send the UE CONTEXT RELEASE X2 message to the source eNB, thus
-   * successfully terminating an X2 handover procedure 
-   * 
+   * successfully terminating an X2 handover procedure
+   *
    */
   void SendUeContextRelease ();
 
-  /** 
+  /**
    * Take the necessary actions in response to the reception of an X2 HO preparation failure message
-   * 
+   *
    * \param cellId id of the target cell
    */
   void RecvHandoverPreparationFailure (uint16_t cellId);
 
-  /** 
+  /**
    * Take the necessary actions in response to the reception of an X2 SN STATUS TRANSFER message
-   * 
+   *
    * \param params the SN STATUS
    */
   void RecvSnStatusTransfer (EpcX2SapUser::SnStatusTransferParams params);
- 
-  /** 
+
+  /**
    * Take the necessary actions in response to the reception of an X2 UE CONTEXT RELEASE message
-   * 
+   *
    * \param params the SN STATUS
    */
-  void RecvUeContextRelease (EpcX2SapUser::UeContextReleaseParams params); 
+  void RecvUeContextRelease (EpcX2SapUser::UeContextReleaseParams params);
 
   /**
    *  \brief This function acts as an interface to trigger the connection release towards eNB, EPC and UE
@@ -275,34 +275,34 @@ public:
 
   void DoReceivePdcpSdu (LtePdcpSapUser::ReceivePdcpSduParameters params);
 
-  /** 
-   * 
+  /**
+   *
    * \return the RNTI, i.e., an UE identifier that is unique within
    * the cell
    */
   uint16_t GetRnti (void) const;
 
-  /** 
+  /**
    *
    * \return the IMSI, i.e., a globally unique UE identifier
    */
   uint64_t GetImsi (void) const;
 
-  /** 
-   * 
+  /**
+   *
    * \return the SRS Configuration Index
    */
   uint16_t GetSrsConfigurationIndex (void) const;
 
-  /** 
+  /**
    * Set the SRS configuration index and do the necessary reconfiguration
-   * 
-   * \param srsConfIndex 
+   *
+   * \param srsConfIndex
    */
   void SetSrsConfigurationIndex (uint16_t srsConfIndex);
 
-  /** 
-   * 
+  /**
+   *
    * \return the current state
    */
   State GetState () const;
@@ -336,94 +336,94 @@ public:
 
 private:
 
-  /** 
+  /**
    * Add a new LteDataRadioBearerInfo structure to the UeManager
-   * 
-   * \param radioBearerInfo 
-   * 
+   *
+   * \param radioBearerInfo
+   *
    * \return the id of the newly added data radio bearer structure
    */
   uint8_t AddDataRadioBearerInfo (Ptr<LteDataRadioBearerInfo> radioBearerInfo);
 
-  /** 
+  /**
    * \param drbid the Data Radio Bearer id
-   * 
+   *
    * \return the corresponding LteDataRadioBearerInfo
    */
   Ptr<LteDataRadioBearerInfo> GetDataRadioBearerInfo (uint8_t drbid);
 
-  /** 
+  /**
    * remove the LteDataRadioBearerInfo corresponding to a bearer being released
    *
    * \param drbid the Data Radio Bearer id
    */
   void RemoveDataRadioBearerInfo (uint8_t drbid);
 
-  /** 
-   * 
+  /**
+   *
    * \return an RrcConnectionReconfiguration struct built based on the
    * current configuration
    */
   LteRrcSap::RrcConnectionReconfiguration BuildRrcConnectionReconfiguration ();
 
-  /** 
-   * 
+  /**
+   *
    * \return a RadioResourceConfigDedicated struct built based on the
    * current configuration
    */
   LteRrcSap::RadioResourceConfigDedicated BuildRadioResourceConfigDedicated ();
 
-  /** 
-   * 
+  /**
+   *
    * \return a newly allocated identifier for a new RRC transaction
    */
   uint8_t GetNewRrcTransactionIdentifier ();
 
-  /** 
+  /**
    * \param lcid a Logical Channel Identifier
-   * 
+   *
    * \return the corresponding Data Radio Bearer Id
    */
   uint8_t Lcid2Drbid (uint8_t lcid);
 
-  /** 
+  /**
    * \param drbid a Data Radio Bearer Id
-   * 
+   *
    * \return the corresponding  Logical Channel Identifier
    */
   uint8_t Drbid2Lcid (uint8_t drbid);
 
-  /** 
+  /**
    * \param lcid a  Logical Channel Identifier
-   * 
+   *
    * \return the corresponding EPS Bearer Identifier
    */
   uint8_t Lcid2Bid (uint8_t lcid);
 
-  /** 
+  /**
    * \param bid  an EPS Bearer Identifier
-   * 
+   *
    * \return the corresponding Logical Channel Identifier
    */
   uint8_t Bid2Lcid (uint8_t bid);
 
-  /** 
+  /**
    * \param drbid Data Radio Bearer Id
-   * 
+   *
    * \return the corresponding EPS Bearer Identifier
    */
   uint8_t Drbid2Bid (uint8_t drbid);
 
-  /** 
+  /**
    * \param bid an EPS Bearer Identifier
-   * 
+   *
    * \return the corresponding Data Radio Bearer Id
    */
   uint8_t Bid2Drbid (uint8_t bid);
 
-  /** 
+  /**
    * Switch the UeManager to the given state
-   * 
+   *
    * \param s the given state
    */
   void SwitchToState (State s);
@@ -513,6 +513,12 @@ private:
    * UE CONTEXT RELEASE is received.
    */
   EventId m_handoverLeavingTimeout;
+  /**
+   * Time limit before a _connection release timeout_ occurs. Set after a UE
+   * when it expires. Reset whenever the UE sends or receives a new transmission.
+   * sends or receives data. Calling LteEnbRrc::ConnectionReleaseTimeout()
+   */
+  EventId m_connectionReleaseTimeout;
 
 }; // end of `class UeManager`
 
@@ -520,7 +526,7 @@ private:
 
 /**
  * \ingroup lte
- * 
+ *
  * The LTE Radio Resource Control entity at the eNB
  */
 class LteEnbRrc : public Object
@@ -561,7 +567,7 @@ public:
    */
   void SetEpcX2SapProvider (EpcX2SapProvider* s);
 
-  /** 
+  /**
    * Get the X2 SAP offered by this RRC
    * \return s the X2 SAP User interface offered to the X2 entity by this RRC entity
    */
@@ -575,7 +581,7 @@ public:
    */
   void SetLteEnbCmacSapProvider (LteEnbCmacSapProvider * s);
 
-  /** 
+  /**
    * Get the CMAC SAP offered by this RRC
    * \return s the CMAC SAP User interface offered to the MAC by this RRC
    */
@@ -651,15 +657,15 @@ public:
   void SetLteMacSapProvider (LteMacSapProvider* s);
 
 
-  /** 
+  /**
    * Set the S1 SAP Provider
-   * 
+   *
    * \param s the S1 SAP Provider
    */
   void SetS1SapProvider (EpcEnbS1SapProvider * s);
 
-  /** 
-   * 
+  /**
+   *
    * \return the S1 SAP user
    */
   EpcEnbS1SapUser* GetS1SapUser ();
@@ -679,11 +685,11 @@ public:
    */
   LteEnbCphySapUser* GetLteEnbCphySapUser ();
 
-  /** 
-   * 
-   * 
+  /**
+   *
+   *
    * \param rnti the identifier of an UE
-   * 
+   *
    * \return true if the corresponding UeManager instance exists
    */
   bool HasUeManager (uint16_t rnti) const;
@@ -696,6 +702,20 @@ public:
    * \return the corresponding UeManager instance
    */
   Ptr<UeManager> GetUeManager (uint16_t rnti);
+
+  /**
+   * Set method for enabling/disabling the Connection Release mechanism.
+   * 
+   * \param enable the Connection Release Mechanism
+   */
+  void SetConnectionReleaseEnabled (bool enable);
+
+  /**
+   * Get method for the Connection Release mechanism.
+   * 
+   * \return whether it is enabled or not.
+   */
+  bool GetConnectionReleaseEnabled () const;
 
   /**
    * \brief Add a new UE measurement reporting configuration
@@ -738,44 +758,44 @@ public:
    */
   void ConfigureCell (uint8_t ulBandwidth,
                       uint8_t dlBandwidth,
-                      uint16_t ulEarfcn, 
+                      uint16_t ulEarfcn,
                       uint16_t dlEarfcn,
                       uint16_t cellId);
 
-  /** 
+  /**
    * set the cell id of this eNB
-   * 
-   * \param m_cellId 
+   *
+   * \param m_cellId
    */
   void SetCellId (uint16_t m_cellId);
 
-  /** 
+  /**
    * Enqueue an IP data packet on the proper bearer for downlink
    * transmission. Normally expected to be called by the NetDevice
-   * forwarding a packet coming from the EpcEnbApplication 
-   * 
+   * forwarding a packet coming from the EpcEnbApplication
+   *
    * \param p the packet
-   * 
+   *
    * \return true if successful, false if an error occurred
    */
   bool SendData (Ptr<Packet> p);
 
-  /** 
+  /**
    * set the callback used to forward data packets up the stack
-   * 
-   * \param cb 
+   *
+   * \param cb
    */
   void SetForwardUpCallback (Callback <void, Ptr<Packet> > cb);
 
-  /** 
+  /**
    * Method triggered when a UE is expected to request for connection but does
    * not do so in a reasonable time. The method will remove the UE context.
-   * 
+   *
    * \param rnti the T-C-RNTI whose timeout expired
    */
   void ConnectionRequestTimeout (uint16_t rnti);
 
-  /** 
+  /**
    * Method triggered when a UE is expected to complete a connection setup
    * procedure but does not do so in a reasonable time. The method will remove
    * the UE context.
@@ -787,28 +807,36 @@ public:
   /**
    * Method triggered a while after sending RRC Connection Rejected. The method
    * will remove the UE context.
-   * 
+   *
    * \param rnti the T-C-RNTI whose timeout expired
    */
   void ConnectionRejectedTimeout (uint16_t rnti);
 
-  /** 
-   * Method triggered when a UE is expected to join the cell for a handover 
+  /**
+   * Method triggered when a UE is expected to join the cell for a handover
    * but does not do so in a reasonable time. The method will remove the UE
    * context.
-   * 
+   *
    * \param rnti the C-RNTI whose timeout expired
    */
   void HandoverJoiningTimeout (uint16_t rnti);
 
-  /** 
+  /**
    * Method triggered when a UE is expected to leave a cell for a handover
    * but no feedback is received in a reasonable time. The method will remove
    * the UE context.
-   * 
+   *
    * \param rnti the C-RNTI whose timeout expired
    */
   void HandoverLeavingTimeout (uint16_t rnti);
+
+  /**
+   * Method triggered when a UE is expected to exchange some data but does
+   * not do so in a reasonable time. The method will remove the UE context.
+   *
+   * \param rnti the C-RNTI whose timeout expired
+   */
+  void ConnectionReleaseTimeout (uint16_t rnti);
 
   /** 
    * Send a HandoverRequest through the X2 SAP interface. This method will
@@ -830,7 +858,7 @@ public:
 
   /**
    * Identifies how EPS Bearer parameters are mapped to different RLC types
-   * 
+   *
    */
   enum LteEpsBearerToRlcMapping_t {RLC_SM_ALWAYS = 1,
                                    RLC_UM_ALWAYS = 2,
@@ -855,7 +883,7 @@ public:
    */
   typedef void (* ConnectionHandoverTracedCallback)
     (uint64_t imsi, uint16_t cellId, uint16_t rnti);
-  
+
   /**
    * TracedCallback signature for handover start events.
    *
@@ -881,14 +909,14 @@ public:
     (uint64_t imsi, uint16_t cellId, uint16_t rnti,
          LteRrcSap::MeasurementReport report);
 
-  
+
   /**
    * \brief Triggers the disconnection of an UE
    * \param rnti
    */
   bool RemoveUeByImsi ( uint16_t rnti );
-  
-  
+
+
 private:
 
 
@@ -966,10 +994,10 @@ private:
   void RemoveUe (uint16_t rnti);
 
 
-  /** 
-   * 
+  /**
+   *
    * \param bearer the specification of an EPS bearer
-   * 
+   *
    * \return the type of RLC that is to be created for the given EPS bearer
    */
   TypeId GetRlcType (EpsBearer bearer);
@@ -980,20 +1008,20 @@ public:
 
   std::map<uint16_t, Ptr<UeManager> > GetUeMap(void);
 
-  /** 
+  /**
    * Add a neighbour with an X2 interface
    *
    * \param cellId neighbouring cell id
    */
   void AddX2Neighbour (uint16_t cellId);
 
-  /** 
-   * 
+  /**
+   *
    * \param p the SRS periodicity in num TTIs
    */
   void SetSrsPeriodicity (uint32_t p);
 
-  /** 
+  /**
    *
    * \return the current SRS periodicity
    */
@@ -1022,41 +1050,41 @@ public:
 
 private:
 
-  /** 
-   * Allocate a new SRS configuration index for a new UE. 
+  /**
+   * Allocate a new SRS configuration index for a new UE.
    *
    * \note this method can have the side effect of updating the SRS
    * configuration index of all UEs
-   * 
+   *
    * \return the newly allocated SRS configuration index
    */
   uint16_t GetNewSrsConfigurationIndex (void);
 
-  /** 
+  /**
    * remove a previously allocated SRS configuration index
    *
    * \note this method can have the side effect of updating the SRS
    * configuration index of all UEs
-   * 
+   *
    * \param srcCi the indext to be removed
    */
   void RemoveSrsConfigurationIndex (uint16_t srcCi);
 
- 
 
-  /** 
-   * 
+
+  /**
+   *
    * \param bearer the characteristics of the bearer
-   * 
+   *
    * \return the Logical Channel Group in a bearer with these
-   * characteristics is put. Used for MAC Buffer Status Reporting purposes. 
+   * characteristics is put. Used for MAC Buffer Status Reporting purposes.
    */
   uint8_t GetLogicalChannelGroup (EpsBearer bearer);
 
-  /** 
-   * 
+  /**
+   *
    * \param bearer the characteristics of the bearer
-   * 
+   *
    * \return the priority level of a bearer with these
    * characteristics is put. Used for the part of UL MAC Scheduling
    * carried out by the UE
@@ -1064,9 +1092,9 @@ private:
   uint8_t GetLogicalChannelPriority (EpsBearer bearer);
 
 
-  /** 
+  /**
    * method used to periodically send System Information
-   * 
+   *
    */
   void SendSystemInformation ();
 
@@ -1200,6 +1228,10 @@ private:
    */
   bool m_admitRrcConnectionRequest;
   /**
+   * Keeps track whether the Connection Release mechanism is enabled or not.
+   */
+  bool m_connectionReleaseEnabled;
+  /**
    * The `RsrpFilterCoefficient` attribute. Determines the strength of
    * smoothing effect induced by layer 3 filtering of RSRP in all attached UE.
    * If equals to 0, no layer 3 filtering is applicable.
@@ -1245,6 +1277,12 @@ private:
    * Release has been previously received, the UE context is destroyed.
    */
   Time m_handoverLeavingTimeoutDuration;
+  /**
+   * The `ConnectionReleaseTimeoutDuration` attribute. If the UE doesn't send
+   * or receive any data before this timeout expires, a CONNECTION RELEASE REQUEST
+   * is sent.
+   */
+  Time m_connectionReleaseTimeoutDuration;
 
   /**
    * The `NewUeContext` trace source. Fired upon creation of a new UE context.
@@ -1268,7 +1306,7 @@ private:
   TracedCallback<uint64_t, uint16_t, uint16_t, uint16_t> m_handoverStartTrace;
 
   /**
-   * The `NotifyConnectionRelease` trace source. Fired when an UE leaves the eNB. 
+   * The `NotifyConnectionRelease` trace source. Fired when an UE leaves the eNB.
    * Exporting IMSI, cell ID, RNTI.
    */
   TracedCallback<uint64_t, uint16_t, uint16_t> m_connectionReleaseTrace;

@@ -145,6 +145,7 @@ private:
     uint64_t imsi;
     uint16_t cellId;
     std::list<BearerInfo> bearersToBeActivated;
+    std::list<BearerInfo> activeBearers;
     uint16_t bearerCounter;
   };
 

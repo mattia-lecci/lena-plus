@@ -243,6 +243,20 @@ public:
    */
   State GetState () const;
 
+  /**
+   * Get method for the Connection Release mechanism.
+   * 
+   * \return whether it is enabled or not.
+   */
+  bool GetConnectionReleaseEnabled () const;
+  
+  /**
+   * Set method for enabling/disabling the Connection Release mechanism.
+   * 
+   * \param enable the Connection Release Mechanism
+   */
+  void SetConnectionReleaseEnabled (bool enable);
+
   /** 
    * 
    * 
@@ -585,6 +599,11 @@ private:
    */
   bool m_useRlcSm;
 
+  /**
+   * Keeps track whether the Connection Release mechanism is enabled or not.
+   */
+  bool m_connectionReleaseEnabled;
+
   uint8_t m_lastRrcTransactionIdentifier;
 
   LteRrcSap::PdschConfigDedicated m_pdschConfigDedicated;
@@ -668,6 +687,11 @@ private:
    * procedure. Exporting IMSI, cell ID, and RNTI.
    */
   TracedCallback<uint64_t, uint16_t, uint16_t> m_handoverEndErrorTrace;
+  /**
+   * The `ConnectionRelease` trace source. Fired upon RRC Connection
+   * Release. Exporting IMSI, cell ID, and RNTI.
+   */
+  TracedCallback<uint64_t, uint16_t, uint16_t> m_connectionReleaseTrace;
 
   /// True if a connection request by upper layers is pending.
   bool m_connectionPending;
