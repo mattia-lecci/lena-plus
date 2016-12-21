@@ -2944,13 +2944,13 @@ LteUeRrc::LeaveConnectedMode ()
   m_asSapUser->NotifyConnectionReleased ();
   // release SRB1 (with default LCID=1)
   m_cmacSapProvider->RemoveLc (1);
+  // m_cmacSapProvider->NotifyConnectionExpired() already does this
   /*std::map<uint8_t, Ptr<LteDataRadioBearerInfo> >::iterator it;
   for (it = m_drbMap.begin (); it != m_drbMap.end (); ++it)
     {
       m_cmacSapProvider->RemoveLc (it->second->m_logicalChannelIdentity);
     }*/
   m_cmacSapProvider->NotifyConnectionExpired();
-  // keeping drb infos (i.e. UE context)
   m_drbMap.clear ();
   m_bid2DrbidMap.clear ();
   m_srb1 = 0;

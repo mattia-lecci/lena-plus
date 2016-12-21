@@ -147,6 +147,8 @@ EpcMme::DoInitialUeMessage (uint64_t mmeUeS1Id, uint16_t enbUeS1Id, uint64_t ims
       bearerContext.bearerLevelQos = bit->bearer; 
       bearerContext.tft = bit->tft;
       msg.bearerContextsToBeCreated.push_back (bearerContext);
+      // adding Bearer To Be Activated into Active Bearer list
+      it->second->activeBearers.push_back (*bit);
     }
   m_s11SapSgw->CreateSessionRequest (msg);
 }
@@ -275,13 +277,13 @@ EpcMme::DoDeleteBearerRequest (EpcS11SapMme::DeleteBearerRequestMessage msg)
 void EpcMme::RemoveBearer (Ptr<UeInfo> ueInfo, uint8_t epsBearerId)
 {
   NS_LOG_FUNCTION (this << epsBearerId);
-  for (std::list<BearerInfo>::iterator bearerIterator = ueInfo->bearersToBeActivated.begin ();
-       bearerIterator != ueInfo->bearersToBeActivated.end ();
+  for (std::list<BearerInfo>::iterator bearerIterator = ueInfo->activeBearers.begin ();
+       bearerIterator != ueInfo->activeBearers.end ();
        ++bearerIterator)
     {
       if (bearerIterator->bearerId == epsBearerId)
         {
-          ueInfo->bearersToBeActivated.erase (bearerIterator);
+          ueInfo->activeBearers.erase (bearerIterator);
           ueInfo->bearerCounter = ueInfo->bearerCounter - 1;
           break;
         }

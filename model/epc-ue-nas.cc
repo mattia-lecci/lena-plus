@@ -248,14 +248,15 @@ EpcUeNas::Send (Ptr<Packet> packet)
     case IDLE_REGISTERED:
       {
         // create first bearer and connect
-        ActivateEpsBearer (EpsBearer (EpsBearer::NGBR_VIDEO_TCP_DEFAULT), EpcTft::Default ());
         Connect ();
+        ActivateEpsBearer (EpsBearer (EpsBearer::NGBR_VIDEO_TCP_DEFAULT), EpcTft::Default ());
+        
         // store packets into a buffer
         m_packetBuffer.push(packet);
         NS_LOG_INFO("Nas is state " << ToString(m_state) << ": Reconnection requested "
                     << "and packet stored into buffer");
         // TODO consider whether it is more appropriate to send false or true
-        return true;
+        return false;
       }
       break;
 
@@ -334,6 +335,7 @@ EpcUeNas::SwitchToState (State newState)
           DoActivateEpsBearer (it->bearer, it->tft);
         }
       // send all the packets that arrived while in IDLE_REGISTERED state
+      NS_LOG_INFO ("Sending " << m_packetBuffer.size() << " packets in buffer");
       while (!m_packetBuffer.empty ())
         {
           Send (m_packetBuffer.top ());
@@ -346,7 +348,6 @@ EpcUeNas::SwitchToState (State newState)
     }
 
 }
-
 
 } // namespace ns3
 

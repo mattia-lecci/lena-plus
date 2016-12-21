@@ -30,14 +30,20 @@ XX aggiungere stato CONNECTION_IDLE su UeManager (.h) e su g_ueManagerStateName 
 
 <<<< LC sono i logic channels del MAC che mappano RB dell'PDCP/RLC/...
 <<<< rimettere doreset per mac
-<<<< EpcMme::AddUe(imsi) chiamato a tempo 0 da LteHelper tramite PointToPointEpcHelper (andrebbe tenuto probabilmente) (aggiunge m_ueInfoMap[imsi])
-<<<< stesso per EpcSgwPgwApplication::AddUe(imsi) in m_ueInfoByImsiMap[imsi]
-<<<< sempre ltehelper a tempo 0 fa EpcUeNas->Connect(), EpcHelper->ActivateEpsBearer:
+<<<< 0s EpcMme::AddUe(imsi) chiamato a tempo 0 da LteHelper tramite PointToPointEpcHelper (andrebbe tenuto probabilmente) (aggiunge m_ueInfoMap[imsi])
+<<<< 0s stesso per EpcSgwPgwApplication::AddUe(imsi) in m_ueInfoByImsiMap[imsi]
+<<<< 0s sempre ltehelper a tempo 0 fa EpcUeNas->Connect(), EpcHelper->ActivateEpsBearer:
     =>LteUeRrc->DoConnect()
     =>m_mme->AddBearer(...)
     =>m_sgwPgwApp->SetUeAddress(..)
     =>ueLteDevice->GetNas()->ActivateEpsBearer(..)
-<<<< a un certo punto parte LteUeRrc::DoRecvSystemInformation(..)=>configura rach=>StartConnection()=>m_cmacSapProvider->startContentionBasedRandomAccessProcedure()=>RandomlySelectAndSendRaPreamble()
+<<<< 0.016s  a un certo punto parte LteUeRrc::DoRecvSystemInformation(..)=>configura rach=>StartConnection()=>m_cmacSapProvider->startContentionBasedRandomAccessProcedure()=>RandomlySelectAndSendRaPreamble()
+<<<< 0.031s dopo un po' parte LteEnbPhy::StartSubFrame()=>LteEnbMac::DoSubframeIndication()=>LteEnbRrc::DoAllocateTemporaryCellRnti()=>LteEnbRrc::AddUe()
+<<<< 0.0332143s Percorso send connection request: LteUeMac::RecvRaResponse=>LteUeRrc::DoNotifyRarReceived=>LteUeRrcProtocolReal::DoSendRrcConnectionRequest(..)
+<<<< 0.0379286s Percorso receive connection request: LteRrcProtocolReal::DoReceivePdcpPdu with message type 1 => m_enbRrcSapProvider->RecvRrcConnectionRequest(..) => ... LteEnbRrc::DoRecvRrcConnectionRequest(..) => GetUeManager (rnti)->RecvRrcConnectionRequest
+
+PROBLEMA: serve che a LteUeRrc arrivi DoRecvRrcConnectionSetup=>ApplyRadioResourceConfigDedicated altrimenti m_bid2DrbidMap non viene popolata
+Viene dato come risposta a una connection request
 
 Riconnessione:
 -- EpcUeNas::Send dovrebbe avvisare l'epc che l'ue vuole riconnettersi se è in stato IDLE_REGISTERED
@@ -56,13 +62,13 @@ PROBLEMA: LteRlcUm::DoNotifyTxOpportunity => m_rnti????????????
 
 
 da controllare:
-	UeManager::RecvRrcConnectionSetupCompleted
-	UeManager::RecvRrcConnectionReconfigurationCompleted
-	UeManager::RecvRrcConnectionReestablishmentComplete
-	UeManager::SwitchToState
-	ns3::EpcX2UeContextReleaseHeader
-	ns3::RrcConnectionReleaseHeader
-	ns3::LteRrcSap::RrcConnectionRelease
+  UeManager::RecvRrcConnectionSetupCompleted
+  UeManager::RecvRrcConnectionReconfigurationCompleted
+  UeManager::RecvRrcConnectionReestablishmentComplete
+  UeManager::SwitchToState
+  ns3::EpcX2UeContextReleaseHeader
+  ns3::RrcConnectionReleaseHeader
+  ns3::LteRrcSap::RrcConnectionRelease
     LteEnbRrc::RemoveUeByImsi (prima chiama UeManager::SendRrcConnectionRelease, poi aspetta 0.2s, poi chiama LteEnbRrc::RemoveUe)
   Leggere TS 36.331 section 5.3.1.1 (introduction)
   Leggere TS 36.331 section 5.3.3(.3a e .4a) (connection resume)
