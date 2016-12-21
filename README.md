@@ -15,7 +15,8 @@ Moreover up to now only PfFfMacScheduler is supported, therefore add also
 
 Furthermore, to activate the Connection Release mechanism, just add this line to your script:
 
-  Config::SetDefault ("ns3::LteHelper::EnableConnectionRelease", BooleanValue (true));
+	Config::SetDefault ("ns3::LteHelper::EnableConnectionRelease", BooleanValue (true));
+As of now, the disconnection feature properly works only with Real Prach and Rrc.
 
 ## Results
 A paper with some experimental results obtained using the realistic RACH model was accepted for presentation at the IEEE ICC 2016 conference, May 23 -27, 2016, Kuala Lumpur, Malaysia, and can be found on IEEExplore: http://ieeexplore.ieee.org/document/7511430/ and http://arxiv.org/abs/1601.05098
