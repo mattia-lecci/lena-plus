@@ -367,6 +367,26 @@ public:
    */
   void Attach (Ptr<NetDevice> ueDevice, Ptr<NetDevice> enbDevice);
 
+  /**
+   * \brief Enables automatic attachment of a UE device to a suitable cell
+   *        using Idle mode initial cell selection procedure.
+   * \param ueDevice the UE device to be attached
+   *
+   * By calling this, the UE will start the initial cell selection procedure
+   * after the indicated delay. In addition, the function also instructs the
+   * UE to immediately enter CONNECTED mode and activates the default EPS
+   * bearer.
+   *
+   * If this function is called when the UE is in a situation where entering
+   * CONNECTED mode is not possible (e.g. before the simulation begin), then the
+   * UE will attempt to connect at the earliest possible time (e.g. after it
+   * camps to a suitable cell).
+   *
+   * Note that this function can only be used in EPC-enabled simulation.
+   */
+  void AttachAfterDelay (Ptr<NetDevice> ueDevice, Time delay);
+  void DoAttachAfterDelay (Ptr<NetDevice> ueDevice);
+
 
   /**
    * \brief Enables automatic attachment of a set of UE devices to a suitable

@@ -152,11 +152,11 @@ uint16_t
 LtePhy::GetSrsPeriodicity (uint16_t srcCi) const
 {
   // from 3GPP TS 36.213 table 8.2-1 UE Specific SRS Periodicity
-  uint16_t SrsPeriodicity[9] = {0, 2, 5, 10, 20, 40, 80, 160, 320};
-  uint16_t SrsCiLow[9] = {0, 0, 2, 7, 17, 37, 77, 157, 317};
-  uint16_t SrsCiHigh[9] = {0, 1, 6, 16, 36, 76, 156, 316, 636};
+  uint16_t SrsPeriodicity[16] = {0, 2, 5, 10, 20, 40,  80, 160, 320,  640, 1280, 2560,  5120, 10240, 20480, 40960};
+  uint16_t SrsCiLow[16] =       {0, 0, 2,  7, 17, 37,  77, 157, 317,  637, 1277, 2557,  5117, 10237, 20477, 40957};
+  uint16_t SrsCiHigh[16] =      {0, 1, 6, 16, 36, 76, 156, 316, 636, 1276, 2556, 5116, 10236, 20476, 4056, 65535};
   uint8_t i;
-  for (i = 8; i > 0; i --)
+  for (i = 15; i > 0; i --)
     {
       if ((srcCi>=SrsCiLow[i])&&(srcCi<=SrsCiHigh[i]))
         {
@@ -170,11 +170,11 @@ uint16_t
 LtePhy::GetSrsSubframeOffset (uint16_t srcCi) const
 {
   // from 3GPP TS 36.213 table 8.2-1 UE Specific SRS Periodicity
-  uint16_t SrsSubframeOffset[9] = {0, 0, 2, 7, 17, 37, 77, 157, 317};
-  uint16_t SrsCiLow[9] = {0, 0, 2, 7, 17, 37, 77, 157, 317};
-  uint16_t SrsCiHigh[9] = {0, 1, 6, 16, 36, 76, 156, 316, 636};
+  uint16_t SrsSubframeOffset[16] = {0, 0, 2,  7, 17, 37,  77, 157, 317,  637, 1277, 2557,  5117, 10237, 20477, 40957};
+  uint16_t SrsCiLow[16] =          {0, 0, 2,  7, 17, 37,  77, 157, 317,  637, 1277, 2557,  5117, 10237, 20477, 40957};
+  uint16_t SrsCiHigh[16] =         {0, 1, 6, 16, 36, 76, 156, 316, 636, 1276, 2556, 5116, 10236, 20476, 4056, 65535};
   uint8_t i;
-  for (i = 8; i > 0; i --)
+  for (i = 15; i > 0; i --)
     {
       if ((srcCi>=SrsCiLow[i])&&(srcCi<=SrsCiHigh[i]))
         {

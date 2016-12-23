@@ -759,6 +759,20 @@ LteHelper::InstallSingleUeDevice (Ptr<Node> n)
   return dev;
 }
 
+void
+LteHelper::AttachAfterDelay (Ptr<NetDevice> ueDevice, Time delay)
+{
+    NS_LOG_FUNCTION (this);
+    NS_LOG_INFO ("Attaching UeDevice with delay "<< delay);
+    Simulator::Schedule(delay, &LteHelper::DoAttachAfterDelay, this, ueDevice);
+    //Simulator::Schedule (delay, &LteHelper::Attach, this, ueDevice);
+}
+
+void LteHelper::DoAttachAfterDelay (Ptr<NetDevice> ueDevice)
+{
+  NS_LOG_FUNCTION (this);
+  Attach (ueDevice);
+}
 
 void
 LteHelper::Attach (NetDeviceContainer ueDevices)
@@ -796,9 +810,9 @@ LteHelper::Attach (Ptr<NetDevice> ueDevice)
   ueNas->Connect ();
 
   // activate default EPS bearer
-  /*m_epcHelper->ActivateEpsBearer (ueDevice, ueLteDevice->GetImsi (),
+  m_epcHelper->ActivateEpsBearer (ueDevice, ueLteDevice->GetImsi (),
                                   EpcTft::Default (),
-                                  EpsBearer (EpsBearer::NGBR_VIDEO_TCP_DEFAULT));*/
+                                  EpsBearer (EpsBearer::NGBR_VIDEO_TCP_DEFAULT));
 }
 
 void

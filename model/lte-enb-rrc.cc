@@ -2498,24 +2498,24 @@ LteEnbRrc::SetCsgId (uint32_t csgId, bool csgIndication)
 
 
 /// Number of distinct SRS periodicity plus one.
-static const uint8_t SRS_ENTRIES = 9;
+static const uint8_t SRS_ENTRIES = 16;
 /**
  * Sounding Reference Symbol (SRS) periodicity (TSRS) in milliseconds. Taken
  * from 3GPP TS 36.213 Table 8.2-1. Index starts from 1.
  */
-static const uint16_t g_srsPeriodicity[SRS_ENTRIES] = {0, 2, 5, 10, 20, 40,  80, 160, 320};
+static const uint16_t g_srsPeriodicity[SRS_ENTRIES] = {0, 2, 5, 10, 20, 40,  80, 160, 320,  640, 1280, 2560,  5120, 10240, 20480, 40960};
 /**
  * The lower bound (inclusive) of the SRS configuration indices (ISRS) which
  * use the corresponding SRS periodicity (TSRS). Taken from 3GPP TS 36.213
  * Table 8.2-1. Index starts from 1.
  */
-static const uint16_t g_srsCiLow[SRS_ENTRIES] =       {0, 0, 2,  7, 17, 37,  77, 157, 317};
+static const uint16_t g_srsCiLow[SRS_ENTRIES] =       {0, 0, 2,  7, 17, 37,  77, 157, 317,  637, 1277, 2557,  5117, 10237, 20477, 40957};
 /**
  * The upper bound (inclusive) of the SRS configuration indices (ISRS) which
  * use the corresponding SRS periodicity (TSRS). Taken from 3GPP TS 36.213
  * Table 8.2-1. Index starts from 1.
  */
-static const uint16_t g_srsCiHigh[SRS_ENTRIES] =      {0, 1, 6, 16, 36, 76, 156, 316, 636};
+static const uint16_t g_srsCiHigh[SRS_ENTRIES] =      {0, 1, 6, 16, 36, 76, 156, 316, 636, 1276, 2556, 5116, 10236, 20476, 4056, 65535};
 
 void
 LteEnbRrc::SetSrsPeriodicity (uint32_t p)
