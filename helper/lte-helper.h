@@ -385,7 +385,6 @@ public:
    * Note that this function can only be used in EPC-enabled simulation.
    */
   void AttachAfterDelay (Ptr<NetDevice> ueDevice, Time delay);
-  void DoAttachAfterDelay (Ptr<NetDevice> ueDevice);
 
 
   /**
@@ -714,6 +713,11 @@ private:
    *  time when a manual bearer de-activation is desired by the simulation user.
    */
   void DoDeActivateDedicatedEpsBearer (Ptr<NetDevice> ueDevice, Ptr<NetDevice> enbDevice, uint8_t bearerId);
+
+  /**
+   * Utility method to avoid overloading problems
+   */
+  void DoAttachAfterDelay (Ptr<NetDevice> ueDevice);
 
 
   /// The downlink LTE channel used in the simulation.
