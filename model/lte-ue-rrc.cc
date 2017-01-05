@@ -2921,7 +2921,8 @@ LteUeRrc::SendMeasurementReport (uint8_t measId)
                                this, measId);
 
       // send the measurement report to eNodeB
-      m_rrcSapUser->SendMeasurementReport (measurementReport);
+      if (m_state == CONNECTED_NORMALLY)
+        m_rrcSapUser->SendMeasurementReport (measurementReport);
     } 
 }
 
