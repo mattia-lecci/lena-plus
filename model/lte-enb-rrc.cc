@@ -1972,8 +1972,7 @@ LteEnbRrc::ConnectionReleaseTimeout (uint16_t rnti)
 {
   NS_LOG_INFO ("ConnectionReleaseTimeout expired for UE with RNTI=" << rnti << ", IMSI=" << GetUeManager (rnti)->GetImsi ());
   NS_LOG_FUNCTION (this << rnti);
-  NS_ASSERT_MSG (GetUeManager (rnti)->GetState () == UeManager::CONNECTED_NORMALLY,//////////////////////////////////////////////////////////
-                  "ConnectionReleaseTimeout in unexpected state " << ToString (GetUeManager (rnti)->GetState ()));
+  // assert removed: release regardless of the state
   RemoveUeByImsi (rnti);
 }
 
