@@ -977,6 +977,7 @@ LteUeRrc::DoRecvRrcConnectionSetup (LteRrcSap::RrcConnectionSetup msg)
         m_rrcSapUser->SendRrcConnectionSetupCompleted (msg2);
         m_cmacSapProvider->NotifyConnectionSuccessful();
         m_asSapUser->NotifyConnectionSuccessful ();
+        m_cphySapProvider->SetDeviceIdle(false);
         // random access trace
         m_randomAccessSuccessfulTrace (m_imsi, m_cellId, m_rnti);
         // rrc trace
@@ -1168,6 +1169,7 @@ of the source PCell;
 
   // disconnect
   this->m_asSapUser->Disconnect();
+  m_cphySapProvider->SetDeviceIdle(true);
   m_connectionReleaseTrace (m_imsi, m_cellId, m_rnti);
 }
 

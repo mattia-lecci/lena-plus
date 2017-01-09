@@ -901,16 +901,6 @@ UeManager::RecvRrcConnectionSetupCompleted (LteRrcSap::RrcConnectionSetupComplet
       SwitchToState (CONNECTED_NORMALLY);
       m_rrc->m_connectionEstablishedTrace (m_imsi, m_rrc->m_cellId, m_rnti);
       NS_LOG_INFO("ConnectionEstablished for RNTI " << m_rnti << "\n");
-
-      if (m_rrc->m_connectionReleaseEnabled)
-        {
-          m_connectionReleaseTimeout.Cancel();
-          m_connectionReleaseTimeout = Simulator::Schedule (
-              m_rrc->m_connectionReleaseTimeoutDuration,
-              &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
-        }
-      break;
-
     default:
       NS_FATAL_ERROR ("method unexpected in state " << ToString (m_state));
       break;
@@ -943,14 +933,6 @@ UeManager::RecvRrcConnectionReconfigurationCompleted (LteRrcSap::RrcConnectionRe
         }
       SwitchToState (CONNECTED_NORMALLY);
       m_rrc->m_connectionReconfigurationTrace (m_imsi, m_rrc->m_cellId, m_rnti);
-
-      if (m_rrc->m_connectionReleaseEnabled)
-        {
-          m_connectionReleaseTimeout.Cancel();
-          m_connectionReleaseTimeout = Simulator::Schedule (
-              m_rrc->m_connectionReleaseTimeoutDuration,
-              &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
-        }
       break;
 
     // This case is added to NS-3 in order to handle bearer de-activation scenario for CONNECTED state UE
@@ -1020,14 +1002,6 @@ UeManager::RecvRrcConnectionReestablishmentComplete (LteRrcSap::RrcConnectionRee
 {
   NS_LOG_FUNCTION (this);
   SwitchToState (CONNECTED_NORMALLY);
-
-  if (m_rrc->m_connectionReleaseEnabled)
-    {
-      m_connectionReleaseTimeout.Cancel();
-      m_connectionReleaseTimeout = Simulator::Schedule (
-          m_rrc->m_connectionReleaseTimeoutDuration,
-          &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
-    }
 }
 
 void
@@ -1322,6 +1296,11 @@ UeManager::SwitchToState (State newState)
                     << ToString (oldState) << " --> " << ToString (newState));
   m_stateTransitionTrace (m_imsi, m_rrc->m_cellId, m_rnti, oldState, newState);
 
+  if (newState != CONNECTED_NORMALLY) // in any case
+    {
+      m_connectionReleaseTimeout.Cancel();
+    }
+
   switch (newState)
     {
     case INITIAL_RANDOM_ACCESS:
@@ -1338,6 +1317,14 @@ UeManager::SwitchToState (State newState)
           {
             ScheduleRrcConnectionReconfiguration ();
           }
+
+          if (m_rrc->m_connectionReleaseEnabled)
+            {
+              m_connectionReleaseTimeout.Cancel();
+              m_connectionReleaseTimeout = Simulator::Schedule (
+                  m_rrc->m_connectionReleaseTimeoutDuration,
+                  &LteEnbRrc::ConnectionReleaseTimeout, m_rrc, m_rnti);
+            }
       }
       break;
 

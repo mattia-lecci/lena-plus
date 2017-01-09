@@ -144,6 +144,10 @@ public:
    */
   virtual void SetPa (double pa) = 0;
 
+  /**
+   * \param setIdle true if UE has entered RRC_IDLE state
+   */
+  virtual void SetDeviceIdle (bool setIdle) = 0;
 };
 
 
@@ -237,6 +241,7 @@ public:
   virtual void SetTransmissionMode (uint8_t txMode);
   virtual void SetSrsConfigurationIndex (uint16_t srcCi);
   virtual void SetPa (double pa);
+  virtual void SetDeviceIdle (bool setIdle);
 
 private:
   MemberLteUeCphySapProvider ();
@@ -331,6 +336,12 @@ MemberLteUeCphySapProvider<C>::SetPa (double pa)
   m_owner->DoSetPa (pa);
 }
 
+template <class C>
+void
+MemberLteUeCphySapProvider<C>::SetDeviceIdle (bool setIdle)
+{
+  m_owner->DoSetDeviceIdle (setIdle);
+}
 
 /**
  * Template for the implementation of the LteUeCphySapUser as a member

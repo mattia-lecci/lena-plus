@@ -208,7 +208,8 @@ LteUePhy::LteUePhy (Ptr<LteSpectrumPhy> dlPhy, Ptr<LteSpectrumPhy> ulPhy)
     m_pssReceived (false),
     m_ueMeasurementsFilterPeriod (MilliSeconds (200)),
     m_ueMeasurementsFilterLast (MilliSeconds (0)),
-    m_rsrpSinrSampleCounter (0)
+    m_rsrpSinrSampleCounter (0),
+    m_isIdle(false)
 {
   m_amc = CreateObject <LteAmc> ();
   m_powerControl = CreateObject <LteUePowerControl> ();
@@ -910,7 +911,16 @@ void
 LteUePhy::ReportUeMeasurements ()
 {
   NS_LOG_FUNCTION (this << Simulator::Now ());
-  NS_LOG_DEBUG (this << " Report UE Measurements ");
+
+  if (m_isIdle) // if it's idle, suspend measurement reports
+    {
+      NS_LOG_DEBUG (this << "UE is idle. Measurement suspended");
+      return;
+    }
+  else
+    {
+      NS_LOG_DEBUG (this << " Report UE Measurements ");
+    }
 
   LteUeCphySapUser::UeMeasurementsParameters ret;
 
@@ -1560,6 +1570,21 @@ LteUePhy::DoSetPa (double pa)
 {
   NS_LOG_FUNCTION (this << pa);
   m_paLinear = pow (10,(pa/10));
+}
+
+void
+LteUePhy::DoSetDeviceIdle (bool setIdle)
+{
+  NS_LOG_FUNCTION (this << setIdle);
+  if (setIdle)
+    {
+      m_isIdle = true;
+    }
+  else if (m_isIdle && !setIdle) // if it's going from idle to connected
+    {
+      m_isIdle = false;
+      Simulator::Schedule (m_ueMeasurementsFilterPeriod, &LteUePhy::ReportUeMeasurements, this);
+    }
 }
 
 void 

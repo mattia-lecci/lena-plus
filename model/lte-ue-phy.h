@@ -357,6 +357,7 @@ private:
   void DoSetTransmissionMode (uint8_t txMode);
   void DoSetSrsConfigurationIndex (uint16_t srcCi);
   void DoSetPa (double pa);
+  void DoSetDeviceIdle (bool setIdle);
 
   // UE PHY SAP methods 
   virtual void DoSendMacPdu (Ptr<Packet> p);
@@ -383,6 +384,11 @@ private:
 
 
   Ptr<LteAmc> m_amc;
+
+  /**
+   * The connection state flag. The UE can either be IDLE or CONNECTED
+   */
+  bool m_isIdle;
 
   /**
    * The `EnableUplinkPowerControl` attribute. If true, Uplink Power Control
