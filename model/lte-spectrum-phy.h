@@ -546,6 +546,7 @@ private:
   std::map< uint32_t, Ptr<LteControlMessage> > m_rxpRachMessageList;
   
   bool m_msg3;
+  bool m_isDeviceIdle;
   State m_state;
   Time m_firstRxStart;
   Time m_firstRxDuration;

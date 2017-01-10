@@ -117,7 +117,8 @@ operator < (const TbId_t& a, const TbId_t& b)
 NS_OBJECT_ENSURE_REGISTERED (LteSpectrumPhy);
 
 LteSpectrumPhy::LteSpectrumPhy ()
-  : m_state (IDLE),
+  : m_isDeviceIdle(false),
+    m_state (IDLE),
     m_cellId (0),
   m_transmissionMode (0),
   m_layersNum (1)
@@ -492,6 +493,11 @@ LteSpectrumPhy::StartTxDataFrame (Ptr<PacketBurst> pb, std::list<Ptr<LteControlM
       
     case IDLE:
     {
+      if (m_isDeviceIdle)
+        {
+          NS_LOG_INFO (this << "cannot transmit data: device is idle");
+          return true; // an error occurred
+        }
       /*
       m_txPsd must be setted by the device, according to
       (i) the available subchannel for transmission
@@ -830,7 +836,11 @@ LteSpectrumPhy::StartRxData (Ptr<LteSpectrumSignalParametersDataFrame> params)
           // To check if we're synchronized to this signal, we check
           // for the CellId which is reported in the
           //  LteSpectrumSignalParametersDataFrame
-          if (params->cellId  == m_cellId)
+          if (m_isDeviceIdle)
+            {
+              NS_LOG_INFO (this << "cannot receive data: device is idle");
+            }
+          else if (params->cellId  == m_cellId)
             {
               NS_LOG_LOGIC (this << " synchronized with this signal (cellId=" << params->cellId << ")");
               if ((m_rxPacketBurstList.empty ())&&(m_rxControlMessageList.empty ()))
@@ -1009,6 +1019,11 @@ LteSpectrumPhy::StartRxDlCtrl (Ptr<LteSpectrumSignalParametersDlCtrlFrame> lteDl
     case RX_DL_CTRL:
     case IDLE:
 
+      if (m_isDeviceIdle)
+        {
+          NS_LOG_INFO (this << "cannot receive downlink control: device is idle");
+          return;
+        }
       // common code for the two states
       // check presence of PSS for UE measuerements
       if (lteDlCtrlRxParams->pss == true)
