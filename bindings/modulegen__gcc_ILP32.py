@@ -20,10 +20,10 @@ def module_init():
 def register_types(module):
     root_module = module.get_root()
     
-    ## log.h (module 'core'): ns3::LogLevel [enumeration]
-    module.add_enum('LogLevel', ['LOG_NONE', 'LOG_ERROR', 'LOG_LEVEL_ERROR', 'LOG_WARN', 'LOG_LEVEL_WARN', 'LOG_DEBUG', 'LOG_LEVEL_DEBUG', 'LOG_INFO', 'LOG_LEVEL_INFO', 'LOG_FUNCTION', 'LOG_LEVEL_FUNCTION', 'LOG_LOGIC', 'LOG_LEVEL_LOGIC', 'LOG_ALL', 'LOG_LEVEL_ALL', 'LOG_PREFIX_FUNC', 'LOG_PREFIX_TIME', 'LOG_PREFIX_NODE', 'LOG_PREFIX_LEVEL', 'LOG_PREFIX_ALL'], import_from_module='ns.core')
     ## ff-mac-common.h (module 'lte'): ns3::SetupRelease_e [enumeration]
     module.add_enum('SetupRelease_e', ['setup', 'release'])
+    ## log.h (module 'core'): ns3::LogLevel [enumeration]
+    module.add_enum('LogLevel', ['LOG_NONE', 'LOG_ERROR', 'LOG_LEVEL_ERROR', 'LOG_WARN', 'LOG_LEVEL_WARN', 'LOG_DEBUG', 'LOG_LEVEL_DEBUG', 'LOG_INFO', 'LOG_LEVEL_INFO', 'LOG_FUNCTION', 'LOG_LEVEL_FUNCTION', 'LOG_LOGIC', 'LOG_LEVEL_LOGIC', 'LOG_ALL', 'LOG_LEVEL_ALL', 'LOG_PREFIX_FUNC', 'LOG_PREFIX_TIME', 'LOG_PREFIX_NODE', 'LOG_PREFIX_LEVEL', 'LOG_PREFIX_ALL'], import_from_module='ns.core')
     ## ff-mac-common.h (module 'lte'): ns3::Result_e [enumeration]
     module.add_enum('Result_e', ['SUCCESS', 'FAILURE'])
     ## ff-mac-common.h (module 'lte'): ns3::CeBitmap_e [enumeration]
@@ -7288,6 +7288,11 @@ def register_Ns3LteUeCphySapProvider_methods(root_module, cls):
     cls.add_method('Reset', 
                    'void', 
                    [], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## lte-ue-cphy-sap.h (module 'lte'): void ns3::LteUeCphySapProvider::SetDeviceIdle(bool setIdle) [member function]
+    cls.add_method('SetDeviceIdle', 
+                   'void', 
+                   [param('bool', 'setIdle')], 
                    is_pure_virtual=True, is_virtual=True)
     ## lte-ue-cphy-sap.h (module 'lte'): void ns3::LteUeCphySapProvider::SetDlBandwidth(uint8_t dlBandwidth) [member function]
     cls.add_method('SetDlBandwidth', 
@@ -15552,6 +15557,10 @@ def register_Ns3LteEnbRrc_methods(root_module, cls):
     cls.add_method('ConnectionRejectedTimeout', 
                    'void', 
                    [param('uint16_t', 'rnti')])
+    ## lte-enb-rrc.h (module 'lte'): void ns3::LteEnbRrc::ConnectionReleaseTimeout(uint16_t rnti) [member function]
+    cls.add_method('ConnectionReleaseTimeout', 
+                   'void', 
+                   [param('uint16_t', 'rnti')])
     ## lte-enb-rrc.h (module 'lte'): void ns3::LteEnbRrc::ConnectionRequestTimeout(uint16_t rnti) [member function]
     cls.add_method('ConnectionRequestTimeout', 
                    'void', 
@@ -15564,6 +15573,11 @@ def register_Ns3LteEnbRrc_methods(root_module, cls):
     cls.add_method('DoSendReleaseDataRadioBearer', 
                    'void', 
                    [param('uint64_t', 'imsi'), param('uint16_t', 'rnti'), param('uint8_t', 'bearerId')])
+    ## lte-enb-rrc.h (module 'lte'): bool ns3::LteEnbRrc::GetConnectionReleaseEnabled() const [member function]
+    cls.add_method('GetConnectionReleaseEnabled', 
+                   'bool', 
+                   [], 
+                   is_const=True)
     ## lte-enb-rrc.h (module 'lte'): ns3::EpcX2SapUser * ns3::LteEnbRrc::GetEpcX2SapUser() [member function]
     cls.add_method('GetEpcX2SapUser', 
                    'ns3::EpcX2SapUser *', 
@@ -15643,6 +15657,10 @@ def register_Ns3LteEnbRrc_methods(root_module, cls):
     cls.add_method('SetCellId', 
                    'void', 
                    [param('uint16_t', 'm_cellId')])
+    ## lte-enb-rrc.h (module 'lte'): void ns3::LteEnbRrc::SetConnectionReleaseEnabled(bool enable) [member function]
+    cls.add_method('SetConnectionReleaseEnabled', 
+                   'void', 
+                   [param('bool', 'enable')])
     ## lte-enb-rrc.h (module 'lte'): void ns3::LteEnbRrc::SetCsgId(uint32_t csgId, bool csgIndication) [member function]
     cls.add_method('SetCsgId', 
                    'void', 
@@ -16753,6 +16771,10 @@ def register_Ns3LteHelper_methods(root_module, cls):
     cls.add_method('Attach', 
                    'void', 
                    [param('ns3::Ptr< ns3::NetDevice >', 'ueDevice'), param('ns3::Ptr< ns3::NetDevice >', 'enbDevice')])
+    ## lte-helper.h (module 'lte'): void ns3::LteHelper::AttachAfterDelay(ns3::Ptr<ns3::NetDevice> ueDevice, ns3::Time delay) [member function]
+    cls.add_method('AttachAfterDelay', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NetDevice >', 'ueDevice'), param('ns3::Time', 'delay')])
     ## lte-helper.h (module 'lte'): void ns3::LteHelper::AttachAndDonotConnect(ns3::NetDeviceContainer ueDevices) [member function]
     cls.add_method('AttachAndDonotConnect', 
                    'void', 
@@ -18310,6 +18332,11 @@ def register_Ns3LteUeRrc_methods(root_module, cls):
                    'uint16_t', 
                    [], 
                    is_const=True)
+    ## lte-ue-rrc.h (module 'lte'): bool ns3::LteUeRrc::GetConnectionReleaseEnabled() const [member function]
+    cls.add_method('GetConnectionReleaseEnabled', 
+                   'bool', 
+                   [], 
+                   is_const=True)
     ## lte-ue-rrc.h (module 'lte'): uint8_t ns3::LteUeRrc::GetDlBandwidth() const [member function]
     cls.add_method('GetDlBandwidth', 
                    'uint8_t', 
@@ -18366,6 +18393,10 @@ def register_Ns3LteUeRrc_methods(root_module, cls):
     cls.add_method('SetAsSapUser', 
                    'void', 
                    [param('ns3::LteAsSapUser *', 's')])
+    ## lte-ue-rrc.h (module 'lte'): void ns3::LteUeRrc::SetConnectionReleaseEnabled(bool enable) [member function]
+    cls.add_method('SetConnectionReleaseEnabled', 
+                   'void', 
+                   [param('bool', 'enable')])
     ## lte-ue-rrc.h (module 'lte'): void ns3::LteUeRrc::SetImsi(uint64_t imsi) [member function]
     cls.add_method('SetImsi', 
                    'void', 

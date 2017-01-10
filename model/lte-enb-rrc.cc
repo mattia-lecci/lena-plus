@@ -901,6 +901,8 @@ UeManager::RecvRrcConnectionSetupCompleted (LteRrcSap::RrcConnectionSetupComplet
       SwitchToState (CONNECTED_NORMALLY);
       m_rrc->m_connectionEstablishedTrace (m_imsi, m_rrc->m_cellId, m_rnti);
       NS_LOG_INFO("ConnectionEstablished for RNTI " << m_rnti << "\n");
+      break;
+
     default:
       NS_FATAL_ERROR ("method unexpected in state " << ToString (m_state));
       break;
