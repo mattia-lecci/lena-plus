@@ -1579,16 +1579,22 @@ LteUePhy::DoSetDeviceIdle (bool setIdle)
   if (setIdle)
     {
       m_isIdle = true;
-      m_downlinkSpectrumPhy->m_isDeviceIdle = true;
+      m_downlinkSpectrumPhy->m_isDeviceIdle = true; // it has to be reactivated manually from LteUeRrc::StartConnection
       m_uplinkSpectrumPhy->m_isDeviceIdle = true;
     }
   else if (m_isIdle && !setIdle) // if it's going from idle to connected
     {
       m_isIdle = false;
       Simulator::Schedule (m_ueMeasurementsFilterPeriod, &LteUePhy::ReportUeMeasurements, this);
-      m_downlinkSpectrumPhy->m_isDeviceIdle = false;
-      m_uplinkSpectrumPhy->m_isDeviceIdle = false;
     }
+}
+
+void
+LteUePhy::DoSetChannelActive (bool setActive)
+{
+  NS_LOG_FUNCTION (this << setActive);
+  m_downlinkSpectrumPhy->m_isDeviceIdle = !setActive;
+  m_uplinkSpectrumPhy->m_isDeviceIdle = !setActive;
 }
 
 void 

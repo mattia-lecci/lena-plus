@@ -1170,6 +1170,7 @@ of the source PCell;
   // disconnect
   this->m_asSapUser->Disconnect();
   m_cphySapProvider->SetDeviceIdle(true);
+  //m_cphySapProvider->SetChannelActive(false); // already done by SetDeviceIdle
   m_connectionReleaseTrace (m_imsi, m_cellId, m_rnti);
 }
 
@@ -2937,6 +2938,7 @@ LteUeRrc::StartConnection ()
   NS_ASSERT (m_hasReceivedSib2);
   m_connectionPending = false; // reset the flag
   SwitchToState (IDLE_RANDOM_ACCESS);
+  m_cphySapProvider->SetChannelActive(true);
   m_cmacSapProvider->StartContentionBasedRandomAccessProcedure ();
 }
 

@@ -145,9 +145,16 @@ public:
   virtual void SetPa (double pa) = 0;
 
   /**
+   * Used to (de)activate measurement reports and LteSpectrumPhy signaling
    * \param setIdle true if UE has entered RRC_IDLE state
    */
   virtual void SetDeviceIdle (bool setIdle) = 0;
+
+  /**
+   * Used to reactivate LteSpectrumPhy signaling when trying to reconnect
+   * \param setActive true if UE is trying to reconnect
+   */
+  virtual void SetChannelActive (bool setActive) = 0;  
 };
 
 
@@ -242,6 +249,7 @@ public:
   virtual void SetSrsConfigurationIndex (uint16_t srcCi);
   virtual void SetPa (double pa);
   virtual void SetDeviceIdle (bool setIdle);
+  virtual void SetChannelActive (bool setActive);
 
 private:
   MemberLteUeCphySapProvider ();
@@ -341,6 +349,13 @@ void
 MemberLteUeCphySapProvider<C>::SetDeviceIdle (bool setIdle)
 {
   m_owner->DoSetDeviceIdle (setIdle);
+}
+
+template <class C>
+void
+MemberLteUeCphySapProvider<C>::SetChannelActive (bool setActive)
+{
+  m_owner->DoSetChannelActive (setActive);
 }
 
 /**
