@@ -195,6 +195,9 @@ std::ostream& operator<< (std::ostream& os, LteSpectrumPhy::State s)
     case LteSpectrumPhy::RX_RACH:
       os << "RX_RACH";
       break;
+    case LteSpectrumPhy::RX_UL_SRS:
+      os << "RX_UL_SRS";
+      break;
     default:
       os << "UNKNOWN";
       break;

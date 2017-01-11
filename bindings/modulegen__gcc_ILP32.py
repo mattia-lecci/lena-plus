@@ -7289,6 +7289,11 @@ def register_Ns3LteUeCphySapProvider_methods(root_module, cls):
                    'void', 
                    [], 
                    is_pure_virtual=True, is_virtual=True)
+    ## lte-ue-cphy-sap.h (module 'lte'): void ns3::LteUeCphySapProvider::SetChannelActive(bool setActive) [member function]
+    cls.add_method('SetChannelActive', 
+                   'void', 
+                   [param('bool', 'setActive')], 
+                   is_pure_virtual=True, is_virtual=True)
     ## lte-ue-cphy-sap.h (module 'lte'): void ns3::LteUeCphySapProvider::SetDeviceIdle(bool setIdle) [member function]
     cls.add_method('SetDeviceIdle', 
                    'void', 
