@@ -2503,7 +2503,7 @@ static const uint16_t g_srsCiLow[SRS_ENTRIES] =       {0, 0, 2,  7, 17, 37,  77,
  * use the corresponding SRS periodicity (TSRS). Taken from 3GPP TS 36.213
  * Table 8.2-1. Index starts from 1.
  */
-static const uint16_t g_srsCiHigh[SRS_ENTRIES] =      {0, 1, 6, 16, 36, 76, 156, 316, 636, 1276, 2556, 5116, 10236, 20476, 4056, 65535};
+static const uint16_t g_srsCiHigh[SRS_ENTRIES] =      {0, 1, 6, 16, 36, 76, 156, 316, 636, 1276, 2556, 5116, 10236, 20476, 40956, 65535};
 
 void
 LteEnbRrc::SetSrsPeriodicity (uint32_t p)
