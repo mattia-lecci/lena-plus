@@ -1116,6 +1116,7 @@ void
 LteUeRrc::DoRecvRrcConnectionRelease (LteRrcSap::RrcConnectionRelease msg)
 {
   NS_LOG_FUNCTION (this << " RNTI " << m_rnti);
+  NS_LOG_INFO ("ConnectionRelease message received");
   /// \todo Currently not implemented, see Section 5.3.8 of 3GPP TS 36.331.
   m_lastRrcTransactionIdentifier = msg.rrcTransactionIdentifier;
 

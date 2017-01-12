@@ -686,6 +686,11 @@ LteSpectrumPhy::StartTxUlSrsFrame ()
       
     case IDLE:
     {
+      if (m_isDeviceIdle)
+      {
+        NS_LOG_INFO (this << "Device is idle, cannot tx SRS");
+        return true; // an error occurred
+      }
       /*
       m_txPsd must be setted by the device, according to
       (i) the available subchannel for transmission
