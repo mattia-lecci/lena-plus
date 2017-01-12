@@ -322,7 +322,7 @@ RrcAsn1Header::SerializePhysicalConfigDedicated (LteRrcSap::PhysicalConfigDedica
           SerializeBoolean (false);
 
           // Serialize srs-ConfigIndex
-          SerializeInteger (physicalConfigDedicated.soundingRsUlConfigDedicated.srsConfigIndex,0,1023);
+          SerializeInteger (physicalConfigDedicated.soundingRsUlConfigDedicated.srsConfigIndex,0,65535);
 
           // Serialize transmissionComb
           SerializeInteger (0,0,1);
@@ -2192,7 +2192,7 @@ RrcAsn1Header::DeserializePhysicalConfigDedicated (LteRrcSap::PhysicalConfigDedi
           bIterator = DeserializeBoolean (&duration,bIterator);
 
           // Deserialize srs-ConfigIndex
-          bIterator = DeserializeInteger (&slct,0,1023,bIterator);
+          bIterator = DeserializeInteger (&slct,0,65535,bIterator);
           physicalConfigDedicated->soundingRsUlConfigDedicated.srsConfigIndex = slct;
 
           // Deserialize transmissionComb
