@@ -358,6 +358,7 @@ private:
   void DoSetSrsConfigurationIndex (uint16_t srcCi);
   void DoSetPa (double pa);
   void DoSetDeviceIdle (bool setIdle);
+  void DoSetChannelActive (bool setActive);
 
   // UE PHY SAP methods 
   virtual void DoSendMacPdu (Ptr<Packet> p);
