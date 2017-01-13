@@ -949,12 +949,22 @@ LteEnbPhy::DoRemoveUe (uint16_t rnti)
   NS_ASSERT_MSG (success, "DeleteUePhy() failed");
 
   // remove also P_A value
-  std::map<uint16_t, double>::iterator it = m_paMap.find (rnti);
-  if (it != m_paMap.end ())
-    {
-      m_paMap.erase (it);
-    }
+  {
+    std::map<uint16_t, double>::iterator it = m_paMap.find (rnti);
+    if (it != m_paMap.end ())
+      {
+        m_paMap.erase (it);
+      }
+  }
 
+  // remove also srs
+  {
+    std::map <uint16_t,uint16_t>::iterator it = m_srsCounter.find (rnti);
+    if (it != m_srsCounter.end ())
+      {
+        m_srsCounter.erase (it);
+      }
+  }
 }
 
 void
